@@ -157,7 +157,7 @@ void CardLinkWindow::onOk(wxCommandEvent&) {
   vector<ActionP> actions;
   for (size_t i = 0; i < free_link_indexes.size(); ++i) {
     if (free_link_indexes[i] >= 0) {
-      actions.push_back(make_intrusive<OneWayLinkCardsAction>(*set, selected_card, linked_uids[i], linked_relation_string, free_link_indexes[i]));
+      actions.push_back(make_intrusive<OneWayLinkCardsAction>(selected_card, linked_uids[i], linked_relation_string, free_link_indexes[i]));
     }
   }
   // Find reciprocal free slots and make actions
@@ -165,11 +165,12 @@ void CardLinkWindow::onOk(wxCommandEvent&) {
   for (size_t i = 0; i < linked_cards.size(); ++i) {
     int free_link_index = linked_cards[i]->findFreeLink(selected_uid, all_existing_uids);
     if (free_link_index >= 0) {
-      actions.push_back(make_intrusive<OneWayLinkCardsAction>(*set, linked_cards[i], selected_uid, selected_relation_string, free_link_index));
+      actions.push_back(make_intrusive<OneWayLinkCardsAction>(linked_cards[i], selected_uid, selected_relation_string, free_link_index));
     }
   }
   // Add action to set
   set->actions.addAction(make_unique<BulkAction>(actions, set, card_list_window, false), false);
+  set->actions.tellListeners(DisplayChangeAction(),true);
   // Done
   EndModal(wxID_OK);
 }

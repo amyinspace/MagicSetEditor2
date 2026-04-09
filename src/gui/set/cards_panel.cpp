@@ -556,7 +556,7 @@ bool CardsPanel::canCopy()  const { CUT_COPY_PASTE(canCopy,  return) }
 void CardsPanel::doCut()          { CUT_COPY_PASTE(doCut,    return (void)) }
 void CardsPanel::doCopy()         { CUT_COPY_PASTE(doCopy,   return (void)) }
 
-// always alow pasting cards, even if something else is selected
+// always allow pasting cards, even if something else is selected
 bool CardsPanel::canPaste() const {
   if (card_list->canPaste()) return true;
   int id = focused_control(this);

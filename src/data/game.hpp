@@ -62,6 +62,9 @@ public:
   
   Dependencies dependent_scripts_cards;           ///< scripts that depend on the card list
   Dependencies dependent_scripts_keywords;        ///< scripts that depend on the keywords
+  Dependencies dependent_scripts_uid;             ///< scripts that depend on the card's uid
+  Dependencies dependent_scripts_notes;           ///< scripts that depend on the card's notes
+  Dependencies dependent_scripts_links;           ///< scripts that depend on the card's links
   Dependencies dependent_scripts_stylesheet;      ///< scripts that depend on the card's stylesheet
   bool         dependencies_initialized;          ///< are the script dependencies comming from this game all initialized?
   

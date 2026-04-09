@@ -67,9 +67,9 @@ public:
 // ----------------------------------------------------------------------------- : Link cards
 
 /// Add a link between two or more cards
-class OneWayLinkCardsAction : public CardListAction {
+class OneWayLinkCardsAction : public Action {
 public:
-  OneWayLinkCardsAction(Set& set, CardP& card, const String& uid, const String& relation, int index);
+  OneWayLinkCardsAction(CardP& card, const String& uid, const String& relation, int index);
 
   String getName(bool to_undo) const override;
   void perform(bool to_undo) override;

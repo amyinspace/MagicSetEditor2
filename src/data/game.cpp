@@ -72,7 +72,7 @@ void Game::add_alt_name_or_warn(const String& alt_name, const String& field_name
   String unified_name = unified_form(alt_name);
   if (card_fields_alt_names.count(unified_name)) {
     if (card_fields_alt_names[unified_name] != field_name) {
-      queue_message(MESSAGE_WARNING, _("Duplicate alt card field name ' ") + unified_name + _(" ' is both an alt for: ' ") + field_name + _(" ' and ' ") + card_fields_alt_names[unified_name] + _(" '."));
+      queue_message(MESSAGE_WARNING, _ERROR_3_("duplicate field name", unified_name, field_name, card_fields_alt_names[unified_name]));
     }
   }
   else {
@@ -114,6 +114,32 @@ void Game::validate(Version v) {
     pack->filter = OptionalScript(_("true"));
     pack->select = SELECT_NO_REPLACE;
     pack_types.push_back(pack);
+  }
+  // check for reserved names
+  for (auto it = card_fields.begin(); it != card_fields.end(); ++it) {
+    FieldP field = *it;
+    String& field_name = field->name;
+    if (
+      field_name == _("data") ||
+      field_name == _("extra_data") ||
+      field_name == _("styling_data") ||
+      field_name == _("has_styling") ||
+      field_name == _("stylesheet") ||
+      field_name == _("time_created") ||
+      field_name == _("time_modified") ||
+      field_name == _("notes") ||
+      field_name == _("uid") ||
+      field_name == _("linked_card_1") ||
+      field_name == _("linked_card_2") ||
+      field_name == _("linked_card_3") ||
+      field_name == _("linked_card_4") ||
+      field_name == _("linked_relation_1") ||
+      field_name == _("linked_relation_2") ||
+      field_name == _("linked_relation_3") ||
+      field_name == _("linked_relation_4")
+    ) {
+      queue_message(MESSAGE_ERROR, _ERROR_1_("reserved field name", field_name));
+    }
   }
   // alternate card field names map
   for (auto it = card_fields.begin(); it != card_fields.end(); ++it) {

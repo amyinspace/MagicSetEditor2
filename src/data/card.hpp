@@ -34,7 +34,10 @@ public:
   /// Default constructor, uses game_for_new_cards to make the game
   Card();
   /// Creates a card using the given game
-  Card(const Game& game);
+  Card(Game& game);
+
+  /// The game this card is made for
+  Game* game;
 
   /// The values on the fields of the card.
   /** The indices should correspond to the card_fields in the Game */
@@ -73,7 +76,7 @@ public:
 
   /// Keyword usage statistics
   vector<pair<const Value*,const Keyword*>> keyword_usage;
-
+  
   /// Get the identification of this card, an identification is something like a name, title, etc.
   /** May return "" */
   String identification() const;

@@ -22,19 +22,21 @@
 
 Card::Card()
 // for files made before we saved these, set the time to 'yesterday', generate a uid
-  : time_created (wxDateTime::Now().Subtract(wxDateSpan::Day()).ResetTime())
+  : game(game_for_reading())
+  , time_created (wxDateTime::Now().Subtract(wxDateSpan::Day()).ResetTime())
   , time_modified(wxDateTime::Now().Subtract(wxDateSpan::Day()).ResetTime())
   , uid(generate_uid())
   , has_styling(false)
 {
-  if (!game_for_reading()) {
+  if (!game) {
     throw InternalError(_("game_for_reading not set"));
   }
-  data.init(game_for_reading()->card_fields);
+  data.init(game->card_fields);
 }
 
-Card::Card(const Game& game)
-  : time_created (wxDateTime::Now())
+Card::Card(Game& game)
+  : game(&game)
+  , time_created (wxDateTime::Now())
   , time_modified(wxDateTime::Now())
   , uid(generate_uid())
   , has_styling(false)
@@ -259,6 +261,36 @@ IndexMap<FieldP, ValueP>& Card::extraDataFor(const StyleSheet& stylesheet) {
 }
 
 void mark_dependency_member(const Card& card, const String& name, const Dependency& dep) {
+  // is it the uid?
+  if (name == _("uid")) {
+    if (card.game) {
+      card.game->dependent_scripts_uid.add(dep);
+    }
+    return;
+  }
+  // is it the notes?
+  if (name == _("notes")) {
+    if (card.game) {
+      card.game->dependent_scripts_notes.add(dep);
+    }
+    return;
+  }
+  // is it a link?
+  if (
+    name == _("linked_card_1") ||
+    name == _("linked_card_2") ||
+    name == _("linked_card_3") ||
+    name == _("linked_card_4") ||
+    name == _("linked_relation_1") ||
+    name == _("linked_relation_2") ||
+    name == _("linked_relation_3") ||
+    name == _("linked_relation_4")
+  ) {
+    if (card.game) {
+      card.game->dependent_scripts_links.add(dep);
+    }
+    return;
+  }
   mark_dependency_member(card.data, name, dep);
 }
 

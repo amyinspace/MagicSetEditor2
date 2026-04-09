@@ -113,7 +113,7 @@ ScriptValueP Context::dependencies(const Dependency& dep, const Script& script) 
   //   - member operator; and it signals a dependency.
   //   - looper construction
   //   - + for function composition
-  // Variable assignments are performed as normall.
+  // Variable assignments are performed as normal.
   // Jumps are tricky:
   //   - I_LOOP:        We want to prevent infinite loops, the solution is that after the first
   //                    iteration we set the looper to a dummy value, so the loop is only executed once.

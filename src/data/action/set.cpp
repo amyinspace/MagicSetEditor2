@@ -71,7 +71,7 @@ AddCardAction::AddCardAction(AddingOrRemoving ar, Set& set, const vector<CardP>&
         }
         else {
           String relation(linked_card->getLinkedRelation(linked_index));
-          card_link_actions.push_back(make_intrusive<OneWayLinkCardsAction>(set, linked_card, new_uid, relation, linked_index));
+          card_link_actions.push_back(make_intrusive<OneWayLinkCardsAction>(linked_card, new_uid, relation, linked_index));
         }
       }
     }
@@ -115,8 +115,8 @@ void ReorderCardsAction::perform(bool to_undo) {
 
 // ----------------------------------------------------------------------------- : Link cards
 
-OneWayLinkCardsAction::OneWayLinkCardsAction(Set& set, CardP& card, const String& uid, const String& relation, int index)
-  : CardListAction(set), card(card), uid(uid), relation(relation)
+OneWayLinkCardsAction::OneWayLinkCardsAction(CardP& card, const String& uid, const String& relation, int index)
+  : card(card), uid(uid), relation(relation)
 {
   switch (index) {
     case 0: {

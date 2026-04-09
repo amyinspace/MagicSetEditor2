@@ -203,9 +203,19 @@ void SetScriptManager::onAction(const Action& action, bool undone) {
     updateAllDependend(set.game->dependent_scripts_keywords);
     return;
   }
+  TYPE_CASE(action, OneWayLinkCardsAction) {
+    updateAllDependend(set.game->dependent_scripts_links, action.card);
+    return;
+  }
   TYPE_CASE_(action, ChangeKeywordModeAction) {
     updateAllDependend(set.game->dependent_scripts_keywords);
     return;
+  }
+  TYPE_CASE(action, ChangeCardNotesAction) {
+    updateAllDependend(set.game->dependent_scripts_notes, action.card);
+  }
+  TYPE_CASE(action, ChangeCardUIDAction) {
+    updateAllDependend(set.game->dependent_scripts_uid, action.card);
   }
   TYPE_CASE(action, ChangeCardStyleAction) {
     updateAllDependend(set.game->dependent_scripts_stylesheet, action.card);
