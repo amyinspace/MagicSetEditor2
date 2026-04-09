@@ -19,7 +19,7 @@ template <typename T> inline T sqr(T x) { return x * x; }
 void linear_blend(Image& img1, const Image& img2, double x1,double y1, double x2,double y2) {
   int width = img1.GetWidth(), height = img1.GetHeight();
   if (img2.GetWidth() != width || img2.GetHeight() != height) {
-    throw Error(_ERROR_("images used for blending must have the same size"));
+    throw Error(_ERROR_1_("blending different sizes", "linear_blend"));
   }
   
   const int fixed = 1<<16; // fixed point multiplier

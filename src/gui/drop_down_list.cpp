@@ -472,13 +472,25 @@ void DropDownList::onMotion(wxMouseEvent& ev) {
 
 void DropDownList::onMouseLeave(wxMouseEvent& ev) {
   if (close_on_mouse_out) {
+    wxPoint screen_pos = ClientToScreen(ev.GetPosition());
+    bool in_parent = parent_menu ? parent_menu->isInRect(screen_pos) : false;
+    bool in_child = open_sub_menu ? open_sub_menu->isInRect(screen_pos) : false;
     wxSize cs = GetClientSize();
-    if (ev.GetX() < 0 || ev.GetY() < 0 || ev.GetX() >= cs.x || ev.GetY() >= cs.y) {
+    bool in_self = !(ev.GetX() < 0 || ev.GetY() < 0 || ev.GetX() >= cs.x || ev.GetY() >= cs.y);
+    if (!(in_parent || in_child || in_self)) {
       hide(false); // outside box; hide it
       ev.Skip();
       return;
     }
   }
+}
+
+bool DropDownList::isInRect(wxPoint screen_pos) {
+  wxRect rect = GetRect();
+  if (screen_pos.x < rect.x || screen_pos.y < rect.y || screen_pos.x > rect.x+rect.width || screen_pos.y > rect.y+rect.height) {
+    return false;
+  }
+  return true;
 }
 
 void DropDownList::onMouseWheel(wxMouseEvent& ev) {

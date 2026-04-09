@@ -116,9 +116,12 @@ private:
   void onMouseLeave(wxMouseEvent&);
   void onMouseWheel(wxMouseEvent& ev);
   void onScroll(wxScrollWinEvent&);
-  
+
   // --------------------------------------------------- : Privates
-  
+
+  /// Is the given screen coordinate inside this menu's rect?
+  bool isInRect(wxPoint screen_pos);
+
   /// Return the y coordinate of an item (in scrolled coordinates)
   int itemPosition(size_t item) const;
   
