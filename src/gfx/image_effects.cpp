@@ -65,6 +65,30 @@ void saturate(Image& image, double amount) {
   }
 }
 
+// ----------------------------------------------------------------------------- : Brightness
+
+void brighten(Image& image, double amount) {
+  if (almost_equal(amount, 0.0)) return;
+  Byte* pix = image.GetData();
+  Byte* end = pix + image.GetWidth() * image.GetHeight() * 3;
+  amount = min(max(amount, -1.0), 1.0);
+  if (amount > 0.0) {
+    double s = 255 * amount;
+    double t = 1.0 - amount;
+    while (pix != end) {
+      pix[0] = s + pix[0] * t;
+      pix++;
+    }
+  } else {
+    double t = 1.0 + amount;
+    while (pix != end) {
+      pix[0] = pix[0] * t;
+      pix++;
+    }
+  }
+  
+}
+
 // ----------------------------------------------------------------------------- : Color inversion
 
 void invert(Image& img) {

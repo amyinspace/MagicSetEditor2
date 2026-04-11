@@ -168,6 +168,12 @@ SCRIPT_FUNCTION(saturate) {
   return make_intrusive<SaturateImage>(input, amount);
 }
 
+SCRIPT_FUNCTION(brighten_image) {
+  SCRIPT_PARAM_C(GeneratedImageP, input);
+  SCRIPT_PARAM(double, amount);
+  return make_intrusive<BrightenImage>(input, amount);
+}
+
 SCRIPT_FUNCTION(invert_image) {
   SCRIPT_PARAM_C(GeneratedImageP, input);
   return make_intrusive<InvertImage>(input);
@@ -345,6 +351,7 @@ void init_script_image_functions(Context& ctx) {
   ctx.setVariable(_("set_combine"),      script_set_combine);
   ctx.setVariable(_("saturate"),         script_saturate);
   ctx.setVariable(_("saturate_image"),   script_saturate);
+  ctx.setVariable(_("brighten_image"),   script_brighten_image);
   ctx.setVariable(_("invert_image"),     script_invert_image);
   ctx.setVariable(_("recolor_image"),    script_recolor_image);
   ctx.setVariable(_("enlarge"),          script_enlarge);

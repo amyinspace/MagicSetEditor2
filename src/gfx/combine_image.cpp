@@ -21,6 +21,7 @@ String combine_to_string(const ImageCombine& combine) {
     case COMBINE_NORMAL:              return "normal";
     case COMBINE_ADD:                 return "add";
     case COMBINE_SUBTRACT:            return "subtract";
+    case COMBINE_AVERAGE:             return "average";
     case COMBINE_STAMP:               return "stamp";
     case COMBINE_DIFFERENCE:          return "difference";
     case COMBINE_NEGATION:            return "negation";
@@ -41,6 +42,7 @@ String combine_to_string(const ImageCombine& combine) {
     case COMBINE_OR:                  return "or";
     case COMBINE_XOR:                 return "xor";
     case COMBINE_SHADOW:              return "shadow";
+    case COMBINE_OFFSET:              return "offset";
     case COMBINE_SYMMETRIC_OVERLAY:   return "symmetric overlay";
     case COMBINE_BRIGHTNESS_TO_ALPHA: return "brightness to alpha";
     case COMBINE_DARKNESS_TO_ALPHA:   return "darkness to alpha";
@@ -152,6 +154,7 @@ IMPLEMENT_REFLECTION_ENUM(ImageCombine) {
   VALUE_N("normal",              COMBINE_NORMAL);
   VALUE_N("add",                 COMBINE_ADD);
   VALUE_N("subtract",            COMBINE_SUBTRACT);
+  VALUE_N("average",             COMBINE_AVERAGE);
   VALUE_N("stamp",               COMBINE_STAMP);
   VALUE_N("difference",          COMBINE_DIFFERENCE);
   VALUE_N("negation",            COMBINE_NEGATION);
@@ -172,6 +175,7 @@ IMPLEMENT_REFLECTION_ENUM(ImageCombine) {
   VALUE_N("or",                  COMBINE_OR);
   VALUE_N("xor",                 COMBINE_XOR);
   VALUE_N("shadow",              COMBINE_SHADOW);
+  VALUE_N("offset",              COMBINE_OFFSET);
   VALUE_N("symmetric overlay",   COMBINE_SYMMETRIC_OVERLAY);
   VALUE_N("brightness to alpha", COMBINE_BRIGHTNESS_TO_ALPHA);
   VALUE_N("darkness to alpha",   COMBINE_DARKNESS_TO_ALPHA);
@@ -294,6 +298,7 @@ template <ImageCombine combine> struct Combine {
 COMBINE_FUN(COMBINE_NORMAL,      b)
 COMBINE_FUN(COMBINE_ADD,         top(a + b))
 COMBINE_FUN(COMBINE_SUBTRACT,    bot(a - b))
+COMBINE_FUN(COMBINE_AVERAGE,     (a + b) / 2)
 COMBINE_FUN(COMBINE_STAMP,       col(a - 2 * b + 256))
 COMBINE_FUN(COMBINE_DIFFERENCE,  abs(a - b))
 COMBINE_FUN(COMBINE_NEGATION,    255 - abs(255 - a - b))
@@ -318,6 +323,7 @@ COMBINE_FUN(COMBINE_AND,         a & b)
 COMBINE_FUN(COMBINE_OR,          a | b)
 COMBINE_FUN(COMBINE_XOR,         a ^ b)
 COMBINE_FUN(COMBINE_SHADOW,      (b * a * a) / (255 * 255))
+COMBINE_FUN(COMBINE_OFFSET,      col(a + b - 128))
 COMBINE_FUN(COMBINE_SYMMETRIC_OVERLAY, (Combine<COMBINE_OVERLAY>::f(a, b) + Combine<COMBINE_OVERLAY>::f(b, a)) / 2)
 COMBINE_FUN(COMBINE_BRIGHTNESS_TO_ALPHA, ((255 - a) * a + a * b) / 255)
 COMBINE_FUN(COMBINE_DARKNESS_TO_ALPHA, (255 * a + (255 - a) * b) / 255)
@@ -453,6 +459,7 @@ void combine_image(Image& a, const Image& b, ImageCombine combine) {
     case COMBINE_NORMAL: a = b; return; // no need to do a per pixel operation
     DISPATCH(COMBINE_ADD);
     DISPATCH(COMBINE_SUBTRACT);
+    DISPATCH(COMBINE_AVERAGE);
     DISPATCH(COMBINE_STAMP);
     DISPATCH(COMBINE_DIFFERENCE);
     DISPATCH(COMBINE_NEGATION);
@@ -473,6 +480,7 @@ void combine_image(Image& a, const Image& b, ImageCombine combine) {
     DISPATCH(COMBINE_OR);
     DISPATCH(COMBINE_XOR);
     DISPATCH(COMBINE_SHADOW);
+    DISPATCH(COMBINE_OFFSET);
     DISPATCH(COMBINE_SYMMETRIC_OVERLAY);
     DISPATCH(COMBINE_BRIGHTNESS_TO_ALPHA);
     DISPATCH(COMBINE_DARKNESS_TO_ALPHA);

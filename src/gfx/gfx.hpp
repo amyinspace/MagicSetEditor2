@@ -93,6 +93,9 @@ void mask_blend(Image& img1, const Image& img2, const Image& mask);
 /// Saturate an image
 void saturate(Image& image, double amount);
 
+/// Brighten an image
+void brighten(Image& image, double amount);
+
 /// Invert the colors in an image
 void invert(Image& img);
 
@@ -120,6 +123,7 @@ enum ImageCombine
 ,  COMBINE_NORMAL
 ,  COMBINE_ADD
 ,  COMBINE_SUBTRACT
+,  COMBINE_AVERAGE
 ,  COMBINE_STAMP
 ,  COMBINE_DIFFERENCE
 ,  COMBINE_NEGATION
@@ -140,6 +144,7 @@ enum ImageCombine
 ,  COMBINE_OR
 ,  COMBINE_XOR
 ,  COMBINE_SHADOW
+,  COMBINE_OFFSET
 ,  COMBINE_SYMMETRIC_OVERLAY
 ,  COMBINE_BRIGHTNESS_TO_ALPHA
 ,  COMBINE_DARKNESS_TO_ALPHA

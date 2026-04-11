@@ -203,6 +203,20 @@ private:
   double amount;
 };
 
+// ----------------------------------------------------------------------------- : BrightenImage
+
+/// Brighten/darken an image
+class BrightenImage : public SimpleFilterImage {
+public:
+  inline BrightenImage(const GeneratedImageP& image, double amount)
+    : SimpleFilterImage(image), amount(amount)
+  {}
+  Image generate(const Options& opt) override;
+  bool operator == (const GeneratedImage& that) const override;
+private:
+  double amount;
+};
+
 // ----------------------------------------------------------------------------- : InvertImage
 
 /// Invert an image

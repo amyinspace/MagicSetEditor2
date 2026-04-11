@@ -201,6 +201,19 @@ bool SaturateImage::operator == (const GeneratedImage& that) const {
     && amount == that2->amount;
 }
 
+// ----------------------------------------------------------------------------- : BrightenImage
+
+Image BrightenImage::generate(const Options& opt) {
+  Image img = image->generate(opt);
+  brighten(img, amount);
+  return img;
+}
+bool BrightenImage::operator == (const GeneratedImage& that) const {
+  const BrightenImage* that2 = dynamic_cast<const BrightenImage*>(&that);
+  return that2 && *image == *that2->image
+    && amount == that2->amount;
+}
+
 // ----------------------------------------------------------------------------- : InvertImage
 
 Image InvertImage::generate(const Options& opt) {
