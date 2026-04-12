@@ -162,6 +162,12 @@ SCRIPT_FUNCTION(set_combine) {
   return make_intrusive<SetCombineImage>(input, image_combine);
 }
 
+SCRIPT_FUNCTION(fill_image) {
+  SCRIPT_PARAM_C(GeneratedImageP, input);
+  SCRIPT_PARAM(Color, color);
+  return make_intrusive<FillImage>(input,color);
+}
+
 SCRIPT_FUNCTION(saturate) {
   SCRIPT_PARAM_C(GeneratedImageP, input);
   SCRIPT_PARAM(double, amount);
@@ -349,6 +355,7 @@ void init_script_image_functions(Context& ctx) {
   ctx.setVariable(_("set_mask"),         script_set_mask);
   ctx.setVariable(_("set_alpha"),        script_set_alpha);
   ctx.setVariable(_("set_combine"),      script_set_combine);
+  ctx.setVariable(_("fill_image"),       script_fill_image);
   ctx.setVariable(_("saturate"),         script_saturate);
   ctx.setVariable(_("saturate_image"),   script_saturate);
   ctx.setVariable(_("brighten_image"),   script_brighten_image);

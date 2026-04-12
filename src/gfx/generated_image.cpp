@@ -188,6 +188,19 @@ bool SetCombineImage::operator == (const GeneratedImage& that) const {
     && image_combine == that2->image_combine;
 }
 
+// ----------------------------------------------------------------------------- : FillImage
+
+Image FillImage::generate(const Options& opt) {
+  Image img = image->generate(opt);
+  fill_image(img, color);
+  return img;
+}
+bool FillImage::operator == (const GeneratedImage& that) const {
+  const FillImage* that2 = dynamic_cast<const FillImage*>(&that);
+  return that2 && *image == *that2->image
+    && color == that2->color;
+}
+
 // ----------------------------------------------------------------------------- : SaturateImage
 
 Image SaturateImage::generate(const Options& opt) {

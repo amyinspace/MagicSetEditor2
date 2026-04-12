@@ -189,6 +189,20 @@ private:
   ImageCombine image_combine;
 };
 
+// ----------------------------------------------------------------------------- : FillImage
+
+/// Fill an image with a given color, without touching the alpha channel
+class FillImage : public SimpleFilterImage {
+public:
+  inline FillImage(const GeneratedImageP& image, Color color)
+    : SimpleFilterImage(image), color(color)
+  {}
+  Image generate(const Options& opt) override;
+  bool operator == (const GeneratedImage& that) const override;
+private:
+  Color color;
+};
+
 // ----------------------------------------------------------------------------- : SaturateImage
 
 /// Saturate/desaturate an image

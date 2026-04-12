@@ -86,6 +86,7 @@ These functions are built into the program, other [[type:function]]s can be defi
 | [[fun:set_mask]]		Set the transparancy mask of an image.
 | [[fun:set_alpha]]		Change the transparency of an image.
 | [[fun:set_combine]]		Change how the image should be combined with the background.
+| [[fun:fill_image]]		Fill an image with a single color.
 | [[fun:saturate_image]]		Saturate/desaturate an image.
 | [[fun:brighten_image]]		Brighten/darken an image.
 | [[fun:invert_image]]		Invert the colors of an image.
