@@ -78,12 +78,76 @@ MemoryDCP getTempDC(DC& dc) {
 }
 
 // Combine the temporary DCs used in the drawing with the main dc
-void combineBuffers(DC& dc, DC* borders, DC* interior) {
-  wxSize s = dc.GetSize();
-  if (borders)  dc.Blit(0, 0, s.GetWidth(), s.GetHeight(), borders,  0, 0, wxOR);
-  if (interior) dc.Blit(0, 0, s.GetWidth(), s.GetHeight(), interior, 0, 0, wxAND_INVERT);
+//void combineBuffers(DC& dc, DC* borders, DC* interior) {
+//  wxSize s = dc.GetSize();
+//  if (borders)  dc.Blit(0, 0, s.GetWidth(), s.GetHeight(), borders,  0, 0, wxOR);
+//  if (interior) dc.Blit(0, 0, s.GetWidth(), s.GetHeight(), interior, 0, 0, wxAND_INVERT);/
+//}
+static void bitwiseBlitOr(Image& dst, const Image& src) {
+    int w = dst.GetWidth();
+    int h = dst.GetHeight();
+    if (src.GetWidth() != w || src.GetHeight() != h) return;
+
+    Byte* dd = dst.GetData();
+    const Byte* sd = src.GetData();
+
+    size_t count = (size_t)w * (size_t)h * 3;
+    for (size_t i = 0; i < count; ++i) {
+        dd[i] = dd[i] | sd[i];
+    }
 }
 
+static void bitwiseBlitAndInvert(Image& dst, const Image& src) {
+    int w = dst.GetWidth();
+    int h = dst.GetHeight();
+    if (src.GetWidth() != w || src.GetHeight() != h) return;
+
+    Byte* dd = dst.GetData();
+    const Byte* sd = src.GetData();
+
+    size_t count = (size_t)w * (size_t)h * 3;
+    for (size_t i = 0; i < count; ++i) {
+        dd[i] = dd[i] & (Byte)~sd[i];
+    }
+}
+
+void combineBuffers(DC& dc, DC* borders, DC* interior) {
+    wxSize s = dc.GetSize();
+
+    // Copy base DC into an image
+    Bitmap outBmp(s.GetWidth(), s.GetHeight(), 24);
+    wxMemoryDC outDC;
+    outDC.SelectObject(outBmp);
+    outDC.Blit(0, 0, s.GetWidth(), s.GetHeight(), &dc, 0, 0, wxCOPY);
+    outDC.SelectObject(wxNullBitmap);
+
+    Image out = outBmp.ConvertToImage();
+
+    if (borders) {
+        Bitmap borderBmp(s.GetWidth(), s.GetHeight(), 24);
+        wxMemoryDC borderCopy;
+        borderCopy.SelectObject(borderBmp);
+        borderCopy.Blit(0, 0, s.GetWidth(), s.GetHeight(), borders, 0, 0, wxCOPY);
+        borderCopy.SelectObject(wxNullBitmap);
+
+        Image borderImg = borderBmp.ConvertToImage();
+        bitwiseBlitOr(out, borderImg);
+    }
+
+    if (interior) {
+        Bitmap interiorBmp(s.GetWidth(), s.GetHeight(), 24);
+        wxMemoryDC interiorCopy;
+        interiorCopy.SelectObject(interiorBmp);
+        interiorCopy.Blit(0, 0, s.GetWidth(), s.GetHeight(), interior, 0, 0, wxCOPY);
+        interiorCopy.SelectObject(wxNullBitmap);
+
+        Image interiorImg = interiorBmp.ConvertToImage();
+        bitwiseBlitAndInvert(out, interiorImg);
+    }
+
+    Bitmap finalBmp(out);
+    dc.DrawBitmap(finalBmp, 0, 0, false);
+}
 void SymbolViewer::draw(DC& dc) {
   bool paintedSomething = false;
   bool buffersFilled    = false;
