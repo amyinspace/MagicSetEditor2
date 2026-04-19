@@ -318,6 +318,11 @@ ChoiceValue::ChoiceValue(const ChoiceFieldP& field, bool initial_first_choice)
 String ChoiceValue::toString() const {
   return value();
 }
+
+bool ChoiceValue::isDefault() {
+  return value.isDefault();
+}
+
 bool ChoiceValue::update(Context& ctx) {
   bool change = field().default_script.invokeOnDefault(ctx, value)
               | field().        script.invokeOn(ctx, value);

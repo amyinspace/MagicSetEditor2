@@ -112,7 +112,9 @@ public:
   
   ValueType value;                ///< The text of this value
   Age       last_update;          ///< When was the text last changed?
-  
+
+  bool isDefault() override;
+
   bool update(Context&) override;
 };
 

@@ -256,6 +256,8 @@ public:
 
   /// Convert this value to a string for use in tables
   virtual String toString() const = 0;
+  /// Check if this value is in the default state
+  virtual bool isDefault();
   /// Apply scripts to this value, return true if the value has changed
   virtual bool update(Context& ctx);
   /// This value has been updated by an action

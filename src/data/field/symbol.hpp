@@ -70,5 +70,7 @@ public:
   
   ValueType filename;    ///< Filename of the symbol (in the current package)
   Age       last_update; ///< When was the symbol last changed?
+
+  bool isDefault() override;
 };
 

@@ -51,6 +51,10 @@ String SymbolValue::toString() const {
   return filename.empty() ? _("") : _("<symbol>");
 }
 
+bool SymbolValue::isDefault() {
+  return filename.empty();
+}
+
 IMPLEMENT_REFLECTION_NO_GET_MEMBER(SymbolValue) {
   if (fieldP->save_value || !handler.isWriting) REFLECT_NAMELESS(filename);
 }

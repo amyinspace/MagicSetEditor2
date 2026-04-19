@@ -199,7 +199,9 @@ public:
   DECLARE_VALUE_TYPE(Choice, Defaultable<String>);
   
   ValueType value;  /// The name of the selected choice
-  
+
+  bool isDefault() override;
+
   bool update(Context&) override;
 };
 

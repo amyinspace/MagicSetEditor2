@@ -77,7 +77,9 @@ public:
   DECLARE_VALUE_TYPE(Color, Defaultable<Color>);
   
   ValueType value;  ///< The value
-  
+
+  bool isDefault() override;
+
   bool update(Context&) override;
 };
 

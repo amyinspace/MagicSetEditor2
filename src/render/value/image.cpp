@@ -117,13 +117,14 @@ Bitmap ImageValueViewer::imagePlaceholder(const Rotation& rot, UInt w, UInt h, c
   // Draw text
   if (editing) {
     // only when in editor mode
+    String label = _LABEL_("load image");
     for (UInt size = 12 ; size > 2 ; --size) {
       dc.SetFont(wxFont(size, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-      RealSize rs = dc.GetTextExtent(_LABEL_("load image"));
+      RealSize rs = dc.GetTextExtent(label);
       if (rs.width <= w - 10 && rs.height < h - 10) {
         // text fits
         RealPoint pos = align_in_rect(ALIGN_MIDDLE_CENTER, rs, rect);
-        dc.DrawText(_LABEL_("load image"), pos, Color(255,255,255), 2, Color(0,0,0), 3); // stroked
+        dc.DrawText(label, pos, Color(255,255,255), 2, Color(0,0,0), 3); // stroked
         break;
       }
     }

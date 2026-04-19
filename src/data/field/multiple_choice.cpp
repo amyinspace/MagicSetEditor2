@@ -52,6 +52,10 @@ IMPLEMENT_REFLECTION_NAMELESS(MultipleChoiceValue) {
   REFLECT_BASE(ChoiceValue);
 }
 
+bool MultipleChoiceValue::isDefault() {
+  return value.isDefault();
+}
+
 bool MultipleChoiceValue::update(Context& ctx) {
   String old_value = value();
   ctx.setVariable(_("last_change"), to_script(last_change));

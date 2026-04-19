@@ -305,6 +305,10 @@ bool Value::equals(const Value* that) {
   return this == that;
 }
 
+bool Value::isDefault() {
+  return false;
+}
+
 bool Value::update(Context& ctx) {
   updateAge();
   updateSortValue(ctx);

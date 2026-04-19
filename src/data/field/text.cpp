@@ -177,6 +177,11 @@ IMPLEMENT_REFLECTION(TextStyle) {
 String TextValue::toString() const {
   return untag_hide_sep(value());
 }
+
+bool TextValue::isDefault() {
+  return value.isDefault();
+}
+
 bool TextValue::update(Context& ctx) {
   updateAge();
   WITH_DYNAMIC_ARG(last_update_age,     last_update.get());

@@ -63,7 +63,9 @@ public:
   
   /// Splits the value, stores the selected choices in the out parameter
   void get(vector<String>& out) const;
-  
+
+  bool isDefault() override;
+
   bool update(Context&) override;
   
 private:

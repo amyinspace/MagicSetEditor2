@@ -61,7 +61,9 @@ public:
   
   /// Get the package (if it is set), otherwise return nullptr
   PackagedP getPackage() const;
-  
+
+  bool isDefault() override;
+
   bool update(Context&) override;
 };
 

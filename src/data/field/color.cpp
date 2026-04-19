@@ -111,6 +111,11 @@ String ColorValue::toString() const {
   }
   return _("<color>");
 }
+
+bool ColorValue::isDefault() {
+  return value.isDefault();
+}
+
 bool ColorValue::update(Context& ctx) {
   bool change = field().default_script.invokeOnDefault(ctx, value)
               | field().        script.invokeOn(ctx, value);

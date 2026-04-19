@@ -62,6 +62,12 @@ PackagedP PackageChoiceValue::getPackage() const {
   else return package_manager.openAny(package_name, true);
 }
 
+bool PackageChoiceValue::isDefault() {
+  PackageChoiceFieldP packageFieldP = boost::dynamic_pointer_cast<PackageChoiceField>(fieldP);
+  if (packageFieldP) return package_name == packageFieldP->initial;
+  return false;
+}
+
 bool PackageChoiceValue::update(Context& ctx) {
   bool change = field().script.invokeOn(ctx, package_name);
   Value::update(ctx);

@@ -60,7 +60,9 @@ public:
   DECLARE_VALUE_TYPE(Info, String);
   
   ValueType value;
-  
+
+  bool isDefault() override;
+
   bool update(Context&) override;
 };
 

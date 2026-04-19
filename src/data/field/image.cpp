@@ -39,6 +39,10 @@ String ImageValue::toString() const {
   return filename.empty() ? _("") : _("<image>");
 }
 
+bool ImageValue::isDefault() {
+  return filename.empty();
+}
+
 // custom reflection: convert to ScriptImageP for scripting
 
 void ImageValue::reflect(Reader& handler) {

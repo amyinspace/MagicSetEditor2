@@ -78,6 +78,7 @@ These functions are built into the program, other [[type:function]]s can be defi
 | [[fun:exclusive_choice]]		Require that at most one of the given choices is selected.
 | [[fun:require_exclusive_choice]]	Require that exactly one of the given choices is selected.
 | [[fun:remove_choice]]			Remove the given choices from a multiple choice value.
+| [[fun:is_default]]			Check if a field is in its default state.
 	
 ! Images			<<<
 | [[fun:linear_blend]]		Blend two images together using a linear gradient.

@@ -63,6 +63,11 @@ IMPLEMENT_REFLECTION(InfoStyle) {
 String InfoValue::toString() const {
   return value;
 }
+
+bool InfoValue::isDefault() {
+  return true;
+}
+
 bool InfoValue::update(Context& ctx) {
   if (value.empty()) value = field().caption.get();
   bool change = field().script.invokeOn(ctx, value);

@@ -189,6 +189,13 @@ SCRIPT_FUNCTION_DEPENDENCIES(combined_editor) {
   return dependency_dummy;
 }
 
+// ----------------------------------------------------------------------------- : Values
+
+SCRIPT_FUNCTION(is_default) {
+  SCRIPT_PARAM_C(ValueP,input);
+  SCRIPT_RETURN(input->isDefault());
+}
+
 // ----------------------------------------------------------------------------- : Choice values
 
 // convert a full choice name into the name of the top level group it is in
@@ -389,6 +396,7 @@ SCRIPT_FUNCTION(count_chosen) {
 void init_script_editor_functions(Context& ctx) {
   ctx.setVariable(_("forward_editor"),           script_combined_editor); // compatability
   ctx.setVariable(_("combined_editor"),          script_combined_editor);
+  ctx.setVariable(_("is_default"),               script_is_default);
   ctx.setVariable(_("primary_choice"),           script_primary_choice);
   ctx.setVariable(_("chosen"),                   script_chosen);
   ctx.setVariable(_("count_chosen"),             script_count_chosen);
