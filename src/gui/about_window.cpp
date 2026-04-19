@@ -40,7 +40,8 @@ const char* MSE_AUTHORS[] = {
   "Olivier Bocksberger (G-e-n-e-v-e-n-s-i-S)",
   "Brendan Hagan (haganbmj)",
   "Thomas Tkacz (TomTkacz)",
-  "CaiCai (247321453)"
+  "CaiCai (247321453)",
+  "Amy Markey (amyinspace)"
 };
 
 void AboutWindow::draw(DC& dc) {
