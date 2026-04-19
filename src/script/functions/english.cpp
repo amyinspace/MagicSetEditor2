@@ -7,6 +7,7 @@
 // ----------------------------------------------------------------------------- : Includes
 
 #include <util/prec.hpp>
+#include <script/functions/english_exceptions.cpp>
 #include <script/functions/functions.hpp>
 #include <script/functions/util.hpp>
 #include <util/tagged_string.hpp>
@@ -153,7 +154,21 @@ SCRIPT_FUNCTION(english_number_ordinal) {
 // ----------------------------------------------------------------------------- : Singular/plural
 
 String english_singular(const String& str) {
-  if (str.Lower() == _("plains")) return str;
+  if (str.empty()) return String();
+
+  String lower = str.Lower();
+  if (english_singular_exceptions.find(lower) != english_singular_exceptions.end()) {
+    if (isupper(str[0])) {
+      if (isupper(str[str.size()-1])) {
+        return english_singular_exceptions[lower].Upper();
+      } else {
+        return capitalize(english_singular_exceptions[lower]);
+      }
+    } else {
+      return english_singular_exceptions[lower];
+    }
+  }
+
   if (str.size() > 3 && is_substr(str, str.size()-3, _("ies"))) {
     return str.substr(0, str.size() - 3) + _("y");
   } else if (str.size() > 3 && is_substr(str, str.size()-3, _("oes"))) {
@@ -175,7 +190,21 @@ String english_singular(const String& str) {
   }
 }
 String english_plural(const String& str) {
-  if (str.Lower() == _("plains")) return str;
+  if (str.empty()) return String();
+
+  String lower = str.Lower();
+  if (english_plural_exceptions.find(lower) != english_plural_exceptions.end()) {
+    if (isupper(str[0])) {
+      if (isupper(str[str.size()-1])) {
+        return english_plural_exceptions[lower].Upper();
+      } else {
+        return capitalize(english_plural_exceptions[lower]);
+      }
+    } else {
+      return english_plural_exceptions[lower];
+    }
+  }
+
   if (str.size() > 2) {
     Char a = str.GetChar(str.size() - 2);
     Char b = str.GetChar(str.size() - 1);
