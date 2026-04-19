@@ -79,9 +79,60 @@ MemoryDCP getTempDC(DC& dc) {
 
 // Combine the temporary DCs used in the drawing with the main dc
 void combineBuffers(DC& dc, DC* borders, DC* interior) {
-  wxSize s = dc.GetSize();
-  if (borders)  dc.Blit(0, 0, s.GetWidth(), s.GetHeight(), borders,  0, 0, wxOR);
-  if (interior) dc.Blit(0, 0, s.GetWidth(), s.GetHeight(), interior, 0, 0, wxAND_INVERT);
+  if (!borders && !interior) return;
+
+  wxSize size = dc.GetSize();
+  int width = size.GetWidth();
+  int height = size.GetHeight();
+
+#ifdef __WXMSW__
+  if (borders)  dc.Blit(0, 0, width, height, borders,  0, 0, wxOR);
+  if (interior) dc.Blit(0, 0, width, height, interior, 0, 0, wxAND_INVERT);
+#else
+  // wxOR and wxAND_INVERT are currently only implemented on Windows, so we have to do them manually
+  size_t count = (size_t)width * (size_t)height * 3;
+
+  // Copy base DC into an image
+  Bitmap outBmp(width, height, 24);
+  wxMemoryDC outDC;
+  outDC.SelectObject(outBmp);
+  outDC.Blit(0, 0, width, height, &dc, 0, 0, wxCOPY);
+  outDC.SelectObject(wxNullBitmap);
+  Image outImg = outBmp.ConvertToImage();
+  Byte* outData = outImg.GetData();
+
+  // wxOR border
+  if (borders) {
+    Bitmap borderBmp(width, height, 24);
+    wxMemoryDC borderDC;
+    borderDC.SelectObject(borderBmp);
+    borderDC.Blit(0, 0, width, height, borders, 0, 0, wxCOPY);
+    borderDC.SelectObject(wxNullBitmap);
+    Image borderImg = borderBmp.ConvertToImage();
+    Byte* borderData = borderImg.GetData();
+    for (size_t i = 0; i < count; ++i) {
+      outData[i] = outData[i] | borderData[i];
+    }
+  }
+
+  // wxAND_INVERT interior
+  if (interior) {
+    Bitmap interiorBmp(width, height, 24);
+    wxMemoryDC interiorDC;
+    interiorDC.SelectObject(interiorBmp);
+    interiorDC.Blit(0, 0, width, height, interior, 0, 0, wxCOPY);
+    interiorDC.SelectObject(wxNullBitmap);
+    Image interiorImg = interiorBmp.ConvertToImage();
+    Byte* interiorData = interiorImg.GetData();
+    for (size_t i = 0; i < count; ++i) {
+      outData[i] = outData[i] & (Byte)~interiorData[i];
+    }
+  }
+
+  Bitmap finalBmp(outImg);
+  dc.DrawBitmap(finalBmp, 0, 0, false);
+#endif
+  
 }
 
 void SymbolViewer::draw(DC& dc) {
