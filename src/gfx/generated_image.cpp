@@ -787,23 +787,27 @@ bool SetMetadataImage::operator == (const GeneratedImage& that) const {
 
 ImportedImage::ImportedImage(Set* set, const String& filepath)
 {
-  loadpath = filepath;
-
   // has the set already been saved at least once?
-  if (set->needSaveAs()) throw ScriptError(_ERROR_1_("can't import image without set", loadpath));
+  if (set->needSaveAs()) throw ScriptError(_ERROR_1_("can't import image without set", filepath));
+
+  // determine save name
+  loadpath = filepath;
+  savename = normalize_internal_filename(loadpath + _(".png"));
+  savename.Replace(":",  "-");
+  savename.Replace("/",  "-");
 
   // does the file pointed to by filepath exist?
-  if (!wxFileName(loadpath, wxPATH_UNIX).FileExists()) throw ScriptError(_ERROR_1_("import not found", loadpath));
-
+  if (!wxFileName(loadpath, wxPATH_UNIX).FileExists()) {
+    if (set->contains(savename)) return;
+    else throw ScriptError(_ERROR_1_("import not found", loadpath));
+  }
+  
   // is the file an image?
   Image img;
   img.LoadFile(loadpath);
   if (!img.IsOk()) throw ScriptError(_ERROR_1_("import not image", loadpath));
 
   // add the file to the set (or overwrite it if pre-existing), save set
-  savename = normalize_internal_filename(loadpath + _(".png"));
-  savename.Replace(":",  "-");
-  savename.Replace("/",  "-");
   auto outStream = set->openOut(savename);
   img.SaveFile(*outStream, wxBITMAP_TYPE_PNG);
   if (!outStream->IsOk()) throw ScriptError(_ERROR_1_("can't write image to set", loadpath));
@@ -829,14 +833,21 @@ bool ImportedImage::operator == (const GeneratedImage& that) const {
 
 DownloadedImage::DownloadedImage(Set* set, const String& url)
 {
-  loadpath = url;
-
   // has the set already been saved at least once?
-  if (set->needSaveAs()) throw ScriptError(_ERROR_1_("can't download image without set", loadpath));
+  if (set->needSaveAs()) throw ScriptError(_ERROR_1_("can't download image without set", url));
+
+  // determine save name
+  loadpath = url;
+  savename = normalize_internal_filename(loadpath + _(".png"));
+  savename.Replace(":",  "-");
+  savename.Replace("/",  "-");
 
   // can we download the data?
   WebRequestWindow wnd(loadpath);
-  if (wnd.ShowModal() != wxID_OK) throw ScriptError(_ERROR_1_("can't download image", loadpath));
+  if (wnd.ShowModal() != wxID_OK) {
+    if (set->contains(savename)) return;
+    else throw ScriptError(_ERROR_1_("can't download image", loadpath));
+  }
 
   // is the data an image?
   const String& content_type = wnd.out.GetContentType();
@@ -845,9 +856,6 @@ DownloadedImage::DownloadedImage(Set* set, const String& url)
   if (!img.IsOk()) throw ScriptError(_ERROR_("web request corrupted"));
 
   // add the file to the set (or overwrite it if pre-existing), save set
-  savename = normalize_internal_filename(loadpath + _(".png"));
-  savename.Replace(":",  "-");
-  savename.Replace("/",  "-");
   auto outStream = set->openOut(savename);
   img.SaveFile(*outStream, wxBITMAP_TYPE_PNG);
   if (!outStream->IsOk()) throw ScriptError(_ERROR_1_("can't write image to set", loadpath));

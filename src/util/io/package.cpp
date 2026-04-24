@@ -684,7 +684,9 @@ void Packaged::validate(Version) {
 
 void Packaged::requireDependency(Packaged* package) {
   if (package == this) return; // dependency on self
+  if (this->relativeFilename().find("mse-set") != String::npos) return; // skip checks on sets
   String n = package->relativeFilename();
+  if (n.find("mse-symbol-font") != String::npos) return; // skip checks for symbol-fonts
   FOR_EACH(dep, dependencies) {
     if (dep->package == n) {
       if (package->version < dep->version) {
@@ -696,8 +698,6 @@ void Packaged::requireDependency(Packaged* package) {
       }
     }
   }
-  // skip dependency checks for symbol-fonts
-  if (package->relativeFilename().find("mse-symbol-font") != std::string::npos) return;
   // dependency not found
   queue_message(MESSAGE_WARNING,_ERROR_4_("dependency not given", name(), package->relativeFilename(), package->relativeFilename(), package->version.toString()));
 }

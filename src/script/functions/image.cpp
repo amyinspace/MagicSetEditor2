@@ -81,28 +81,22 @@ SCRIPT_FUNCTION(set_metadata) {
 
 SCRIPT_FUNCTION(width_of) {
   SCRIPT_PARAM(Set*, set);
-  SCRIPT_PARAM(CardP, card);
   SCRIPT_PARAM(GeneratedImageP, input);
-  StyleSheet* stylesheet = card && card->stylesheet ? card->stylesheet.get() : set->stylesheet.get();
-  Image image = input->generate(GeneratedImage::Options(0, 0, stylesheet));
+  Image image = input->generate(GeneratedImage::Options(0, 0, set, set));
   SCRIPT_RETURN(image.GetWidth());
 }
 
 SCRIPT_FUNCTION(height_of) {
   SCRIPT_PARAM(Set*, set);
-  SCRIPT_PARAM(CardP, card);
   SCRIPT_PARAM(GeneratedImageP, input);
-  StyleSheet* stylesheet = card && card->stylesheet ? card->stylesheet.get() : set->stylesheet.get();
-  Image image = input->generate(GeneratedImage::Options(0, 0, stylesheet));
+  Image image = input->generate(GeneratedImage::Options(0, 0, set, set));
   SCRIPT_RETURN(image.GetHeight());
 }
 
 SCRIPT_FUNCTION(dimensions_of) {
   SCRIPT_PARAM(Set*, set);
-  SCRIPT_PARAM(CardP, card);
   SCRIPT_PARAM(GeneratedImageP, input);
-  StyleSheet* stylesheet = card && card->stylesheet ? card->stylesheet.get() : set->stylesheet.get();
-  Image image = input->generate(GeneratedImage::Options(0, 0, stylesheet));
+  Image image = input->generate(GeneratedImage::Options(0, 0, set, set));
   ScriptCustomCollectionP ret(new ScriptCustomCollection());
   ret->value.push_back(to_script(image.GetWidth()));
   ret->value.push_back(to_script(image.GetHeight()));
