@@ -142,15 +142,30 @@ void set_alpha(Image& img, Byte* al, const wxSize& alpha_size) {
 }
 
 void set_alpha(Image& img, double alpha) {
-  Byte b_alpha = Byte(alpha * 255);
-  if (!img.HasAlpha()) {
-    img.InitAlpha();
-    memset(img.GetAlpha(), b_alpha, img.GetWidth() * img.GetHeight());
-  } else {
-    Byte *im = img.GetAlpha();
-    size_t size = img.GetWidth() * img.GetHeight();
-    for (size_t i = 0 ; i < size ; ++i) {
-      im[i] = (im[i] * b_alpha) / 255;
+  size_t size = img.GetWidth() * img.GetHeight();
+  if (alpha <= 0.0) {
+    if (!img.HasAlpha()) img.InitAlpha();
+    memset(img.GetAlpha(), Byte(0), size);
+  }
+  else if (alpha > 1.0) {
+    if (!img.HasAlpha()) return;
+    else {
+      Byte *im = img.GetAlpha();
+      for (size_t i = 0 ; i < size ; ++i) {
+        im[i] = Byte(min(im[i] * alpha, 255.0));
+      }
+    }
+  }
+  else {
+    Byte b_alpha = Byte(alpha * 255);
+    if (!img.HasAlpha()) {
+      img.InitAlpha();
+      memset(img.GetAlpha(), b_alpha, size);
+    } else {
+      Byte *im = img.GetAlpha();
+      for (size_t i = 0 ; i < size ; ++i) {
+        im[i] = (im[i] * b_alpha) / 255;
+      }
     }
   }
 }
