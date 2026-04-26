@@ -86,31 +86,36 @@ void PackageInfoPanel::draw(DC& dc) {
       icon_w = icon.GetWidth();
       icon_h = icon.GetHeight();
     }
-    dc.DrawBitmap(icon, x+(max_size-icon_w)/2, y+(max_size-icon_h)/2);
+    dc.DrawBitmap(icon, x+(max_size-icon_w)/2, y+(max_size-icon_h)/2 + 2);
     x += max_size;
   }
-  // package name
+  // package info
   x += 7;
   dc.SetFont(wxFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, _("Arial")));
+  dc.DrawText(d.short_name, x, y);
+  y += dc.GetCharHeight() + 7;
+  dc.SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, _("Arial")));
   dc.DrawText(d.full_name, x, y);
   y += dc.GetCharHeight() + 7;
-  
-  // version
+
   dc.SetFont(*wxNORMAL_FONT);
   int dy = dc.GetCharHeight() + 3;
-  dc.DrawText(_LABEL_("installed version"),   x, y);
-  dc.DrawText(_LABEL_("installable version"), x, y + 1*dy);
+  dc.DrawText(_LABEL_("folder name"),         x, y);
+  dc.DrawText(_LABEL_("installed version"),   x, y + 1*dy);
+  dc.DrawText(_LABEL_("installable version"), x, y + 2*dy);
   //dc.DrawText(_LABEL_("installer size"),      x, y + 2*dy);
   //dc.DrawText(_LABEL_("installer status"),    x, y + 3*dy);
   // text size?
   int dx = 0, max_dx = 0;
+  dc.GetTextExtent(_LABEL_("folder name"),         &dx, nullptr); max_dx = max(max_dx, dx);
   dc.GetTextExtent(_LABEL_("installed version"),   &dx, nullptr); max_dx = max(max_dx, dx);
   dc.GetTextExtent(_LABEL_("installable version"), &dx, nullptr); max_dx = max(max_dx, dx);
   //dc.GetTextExtent(_LABEL_("installer size"),      &dx, nullptr); max_dx = max(max_dx, dx);
   //dc.GetTextExtent(_LABEL_("installer status"),    &dx, nullptr); max_dx = max(max_dx, dx);
   x += max_dx + 5;
-  dc.DrawText(package->installed ? package->installed->version.toString()   : _LABEL_("no version"), x, y);
-  dc.DrawText(package->installer ? package->description->version.toString() : _LABEL_("no version"), x, y + 1*dy);
+  dc.DrawText(d.name,                                                                                x, y);
+  dc.DrawText(package->installed ? package->installed->version.toString()   : _LABEL_("no version"), x, y + 1*dy);
+  dc.DrawText(package->installer ? package->description->version.toString() : _LABEL_("no version"), x, y + 2*dy);
   //dc.DrawText(_("?"), x, y + 2*dy);
   //dc.DrawText(_("?"), x, y + 3*dy);
 }
