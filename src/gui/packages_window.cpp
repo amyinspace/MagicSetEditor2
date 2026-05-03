@@ -95,7 +95,7 @@ void PackageInfoPanel::draw(DC& dc) {
   dc.DrawText(d.short_name, x, y);
   y += dc.GetCharHeight() + 7;
   dc.SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, _("Arial")));
-  dc.DrawText(d.full_name, x, y);
+  if (d.full_name != d.short_name) dc.DrawText(d.full_name, x, y);
   y += dc.GetCharHeight() + 7;
 
   dc.SetFont(*wxNORMAL_FONT);

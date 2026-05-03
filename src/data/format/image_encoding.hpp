@@ -36,44 +36,44 @@ inline static String encodeRectInWxString(RealRect rect, int degrees) {
          _("</mse-crop-data>");
 }
 
-/// Retreive a rect encoded in a string, return true if successful
+/// Retreive a rect encoded in a string, return true if "<mse-crop-data>" was found
 inline static bool decodeRectFromString(const String& rectString, RealRect& rect_out, int& degrees_out) {
   size_t start = rectString.find(_("<mse-crop-data>"));
   if (start == String::npos) return false;
   size_t end = rectString.find(_("</mse-crop-data>"), start + 15);
-  if (end == String::npos) return false;
+  if (end == String::npos) return true;
   String string = rectString.substr(start + 15, end - (start + 15));
-  if (string.empty()) return false;
+  if (string.empty()) return true;
 
   size_t divider = string.find(_(";"));
-  if (divider == String::npos) return false;
-  if (divider == 0) return false;
+  if (divider == String::npos) return true;
+  if (divider == 0) return true;
   int x;
-  if(!string.substr(0, divider).ToInt(&x)) return false;
+  if(!string.substr(0, divider).ToInt(&x)) return true;
   string = string.substr(divider + 1);
 
   divider = string.find(_(";"));
-  if (divider == String::npos) return false;
-  if (divider == 0) return false;
+  if (divider == String::npos) return true;
+  if (divider == 0) return true;
   int y;
-  if(!string.substr(0, divider).ToInt(&y)) return false;
+  if(!string.substr(0, divider).ToInt(&y)) return true;
   string = string.substr(divider + 1);
 
   divider = string.find(_(";"));
-  if (divider == String::npos) return false;
-  if (divider == 0) return false;
+  if (divider == String::npos) return true;
+  if (divider == 0) return true;
   int width;
-  if(!string.substr(0, divider).ToInt(&width)) return false;
+  if(!string.substr(0, divider).ToInt(&width)) return true;
   string = string.substr(divider + 1);
 
   divider = string.find(_(";"));
-  if (divider == String::npos) return false;
-  if (divider == 0) return false;
+  if (divider == String::npos) return true;
+  if (divider == 0) return true;
   int height;
-  if(!string.substr(0, divider).ToInt(&height)) return false;
+  if(!string.substr(0, divider).ToInt(&height)) return true;
   string = string.substr(divider + 1);
 
-  if(!string.ToInt(&degrees_out)) return false;
+  if(!string.ToInt(&degrees_out)) return true;
 
   rect_out = RealRect(x, y, width, height);
   return true;
@@ -81,17 +81,18 @@ inline static bool decodeRectFromString(const String& rectString, RealRect& rect
 
 /// Retreive a rect encoded in a string, apply a transformation, then encode it back
 inline static String transformEncodedRect(const String& rectString, RectTransform transform, double param_x, double param_y, int mode) {
-  RealRect rect(0,0,0,0);
-  int degrees;
-  if (!decodeRectFromString(rectString, rect, degrees)) return _("");
-  transform(rect, degrees, param_x, param_y, mode);
-  return encodeRectInWxString(rect, degrees);
+  RealRect rect(0.0, 0.0, 0.0, 0.0);
+  int degrees = 0;
+  decodeRectFromString(rectString, rect, degrees);
+  if (rect.width > 0.0 && rect.height > 0.0) {
+    transform(rect, degrees, param_x, param_y, mode);
+    return encodeRectInWxString(rect, degrees);
+  }
+  return _("");
 }
 
 /// Retreive all rects encoded in a string, apply a transformation, then encode them back
 inline static String transformAllEncodedRects(const String& rectString, RectTransform transform, double param_x, double param_y, int mode = 0) {
-  RealRect rect(0,0,0,0);
-  int degrees;
   size_t start = rectString.find(_("<mse-crop-data>"));
   if (start == String::npos) return rectString;
   size_t end = 0;
@@ -184,22 +185,21 @@ inline static std::string encodeImageInString(const Image& img) {
   return s;
 }
 
-/// Retreive an image encoded in a string
-inline static Image decodeImageFromString(const String& string) {
-  Image img;
+/// Retreive an image encoded in a string, return true if "<mse-image-data>" was found
+inline static bool decodeImageFromString(const String& string, Image& img_out) {
   size_t first = string.find(_("<mse-image-data>"));
-  if (first == String::npos) return img;
+  if (first == String::npos) return false;
   size_t last = string.find(_("</mse-image-data>"), first + 16);
-  if (last == String::npos) return img;
+  if (last == String::npos) return true;
   std::string s = string.substr(first + 16, last - (first + 16)).ToStdString();
-  if (s.empty()) return img;
+  if (s.empty()) return true;
 
   const std::string& temppath = (wxFileName::CreateTempFileName(_("mse")) + _(".png")).ToStdString();
   UTF8ToFile(temppath, s);
-  img.LoadFile(temppath, wxBITMAP_TYPE_PNG);
+  img_out.LoadFile(temppath, wxBITMAP_TYPE_PNG);
   wxRemoveFile(temppath);
   wxRemoveFile(temppath.substr(0, temppath.size() - 4));
-  return img;
+  return true;
 }
 
 // ----------------------------------------------------------------------------- : Metadata manipulation

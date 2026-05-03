@@ -98,7 +98,7 @@ void SymbolWindow::init(Window* parent, SymbolP symbol) {
     add_menu_item_tr(menuTool, ID_MODE_POINTS, "mode_curve", "points", wxITEM_CHECK);
     add_menu_item_tr(menuTool, ID_MODE_SHAPES, settings.darkModePrefix() + "circle", "basic_shapes", wxITEM_CHECK);
     add_menu_item_tr(menuTool, ID_MODE_SYMMETRY, "mode_symmetry", "symmetry", wxITEM_CHECK);
-    add_menu_item_tr(menuTool, ID_MODE_PAINT,  settings.darkModePrefix() + "mode_paint", "paint", wxITEM_CHECK);
+    //add_menu_item_tr(menuTool, ID_MODE_PAINT,  settings.darkModePrefix() + "mode_paint", "paint", wxITEM_CHECK);
   menuBar->Append(menuTool, _MENU_("tool"));
   
   SetMenuBar(menuBar);
