@@ -333,6 +333,10 @@ bool CardListBase::parseFiles(wxArrayString& filenames, vector<CardP>& out) {
       std::ifstream ifs(filenames[i].ToStdString());
       if (ifs.bad() || ifs.fail() || !ifs.good() || !ifs.is_open()) continue;
       std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+      bool looks_like_text = std::all_of(content.begin(), content.end(), [](char c) {
+        return isprint(c) || isspace(c);
+      });
+      if (!looks_like_text) continue;
       wxString text(content);
       if (!parseUrl(text, out)) parseText(text, out);
     }
@@ -357,8 +361,9 @@ bool CardListBase::parseImage(Image& image, vector<CardP>& out) {
 
 bool CardListBase::parseText(String& text, vector<CardP>& out) {
   size_t j = out.size();
-  if (size_t pos = text.find("<mse-card-data>") != wxString::npos) {
-    text = text.substr(pos + 14, text.find("</mse-card-data>") - pos - 14);
+  size_t pos = text.find("<mse-card-data>");
+  if (pos != wxString::npos) {
+    text = text.substr(pos + 15, text.find("</mse-card-data>") - pos - 15);
   }
   try {
     ScriptValueP sv = json_to_mse(text, set.get());
@@ -386,54 +391,66 @@ bool CardListBase::parseText(String& text, vector<CardP>& out) {
 
 bool CardListBase::parseData(bool ignore_cards_from_own_card_list) {
   wxBusyCursor wait;
-  wxDataFormat format = drop_target->data_object->GetReceivedFormat();
-  wxDataObject *data = drop_target->data_object->GetObject(format);
+  wxDataObjectComposite* composite = drop_target->data_object;
+  wxDataFormat format = composite->GetReceivedFormat();
   vector<CardP> new_cards;
 
-  if (CardsDataObject* card_data = dynamic_cast<CardsDataObject*>(data)) {
+  if (format == CardsDataObject::format) {
     String id = ignore_cards_from_own_card_list ? drop_target->ignored_id : _("");
-    card_data->getCards(set, id, new_cards);
+    size_t size = composite->GetDataSize(format);
+    if (size > 0) {
+      std::vector<char> buffer(size);
+      if (composite->GetDataHere(format, buffer.data())) {
+        CardsDataObject card_data;
+        card_data.SetData(size, buffer.data());
+        card_data.getCards(set, id, new_cards);
+      }
+    }
   }
-  else switch (format.GetType())
-  {
-    case wxDF_FILENAME:
-    {
-      wxFileDataObject* file_data = static_cast<wxFileDataObject*>(data);
-      wxArrayString filenames = file_data->GetFilenames();
-      parseFiles(filenames, new_cards);
-    }
-    break;
+  else {
+    wxDataObject *data = composite->GetObject(format);
 
-    case wxDF_PNG:
+    switch (format.GetType())
     {
-      wxImageDataObject* image_data = static_cast<wxImageDataObject*>(data);
-      Image image = image_data->GetImage();
-      parseImage(image, new_cards);
-    }
-    break;
+      case wxDF_FILENAME:
+      {
+        wxFileDataObject* file_data = static_cast<wxFileDataObject*>(data);
+        wxArrayString filenames = file_data->GetFilenames();
+        parseFiles(filenames, new_cards);
+      }
+      break;
 
-    case wxDF_BITMAP:
-    {
-      wxBitmapDataObject* bitmap_data = static_cast<wxBitmapDataObject*>(data);
-      wxBitmap bitmap = bitmap_data->GetBitmap();
-      Image image = bitmap.ConvertToImage();
-      parseImage(image, new_cards);
-    }
-    break;
+      case wxDF_PNG:
+      {
+        wxImageDataObject* image_data = static_cast<wxImageDataObject*>(data);
+        Image image = image_data->GetImage();
+        parseImage(image, new_cards);
+      }
+      break;
 
-    case wxDF_UNICODETEXT:
-    case wxDF_TEXT:
-    case wxDF_HTML:
-    {
-      wxTextDataObject* text_data = static_cast<wxTextDataObject*>(data);
-      String text = text_data->GetText();
-      if (!parseUrl(text, new_cards)) parseText(text, new_cards);
-    }
-    break;
+      case wxDF_BITMAP:
+      {
+        wxBitmapDataObject* bitmap_data = static_cast<wxBitmapDataObject*>(data);
+        wxBitmap bitmap = bitmap_data->GetBitmap();
+        Image image = bitmap.ConvertToImage();
+        parseImage(image, new_cards);
+      }
+      break;
 
-    default:
-    {
-      queue_message(MESSAGE_ERROR, _ERROR_("unknown data format"));
+      case wxDF_UNICODETEXT:
+      case wxDF_TEXT:
+      case wxDF_HTML:
+      {
+        wxTextDataObject* text_data = static_cast<wxTextDataObject*>(data);
+        String text = text_data->GetText();
+        if (!parseUrl(text, new_cards)) parseText(text, new_cards);
+      }
+      break;
+
+      default:
+      {
+        queue_message(MESSAGE_ERROR, _ERROR_("unknown data format"));
+      }
     }
   }
 

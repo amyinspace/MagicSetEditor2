@@ -63,7 +63,9 @@ IMPLEMENT_REFLECTION(WrappedCards) {
 
 wxDataFormat CardsDataObject::format(wxString("application/x-mse-cards"));
 
-CardsDataObject::CardsDataObject(const SetP& set, const String id, const vector<CardP>& cards) {
+CardsDataObject::CardsDataObject(const SetP& set, const String& id, const vector<CardP>& cards)
+  : wxCustomDataObject(format)
+{
   // set the stylesheet, so when deserializing we know whos style options we are reading
   vector<bool> has_styling;
   for (size_t i = 0 ; i < cards.size() ; ++i) {
@@ -72,9 +74,15 @@ CardsDataObject::CardsDataObject(const SetP& set, const String id, const vector<
       cards[i]->stylesheet = set->stylesheet;
     }
   }
+
+  // store as raw bytes
   WrappedCards data = { set->game.get(), set->game->name(), id, cards };
-  SetText(serialize_for_clipboard(*set, data));
-  // restore cards
+  String serialized = serialize_for_clipboard(*set, data);
+  wxScopedCharBuffer utf8 = serialized.utf8_str();
+  buffer.assign(utf8.data(), utf8.length());
+  SetData(buffer.size(), buffer.data());
+
+  // restore styling
   for (size_t i = 0 ; i < cards.size() ; ++i) {
     if (has_styling[i]) {
       cards[i]->stylesheet = StyleSheetP();
@@ -83,22 +91,31 @@ CardsDataObject::CardsDataObject(const SetP& set, const String id, const vector<
   SetFormat(format);
 }
 
-CardsDataObject::CardsDataObject() {
-  SetFormat(format);
-}
+CardsDataObject::CardsDataObject()
+  : wxCustomDataObject(format)
+{}
 
-bool CardsDataObject::getCards(const SetP& set, const String id, vector<CardP>& out) {
+bool CardsDataObject::getCards(const SetP& set, const String& id, vector<CardP>& out) {
+  size_t size = GetSize();
+  if (size == 0) return false;
+  const void* raw = GetData();
+  if (!raw) return false;
+
+  String text(wxString::FromUTF8(static_cast<const char*>(raw), size));
   WrappedCards data = { set->game.get(), set->game->name() };
-  deserialize_from_clipboard(data, *set, GetText());
-  if (data.cards.empty()) return false;
-  if (!id.empty() && data.id == id) return false;
-  if (data.game_name == set->game->name()) {
-    // Cards are from the same game
-    out = data.cards;
-    return true;
-  } else {
+  try {
+    deserialize_from_clipboard(data, *set, text);
+  } catch (...) {
+    queue_message(MESSAGE_ERROR, _("DEBUG: Card deserialization failed"));
     return false;
   }
+
+  if (data.cards.empty()) return false;
+  if (!id.empty() && data.id == id) return false;
+  if (data.game_name != set->game->name()) return false;
+  // Cards are from the same game
+  out = data.cards;
+  return true;
 }
 
 // ----------------------------------------------------------------------------- : KeywordDataObject
