@@ -68,7 +68,7 @@ void Set::updateStyles(const CardP& card, bool only_content_dependent) {
 void Set::updateDelayed() {
   script_manager->updateDelayed();
 }
-void Set::buildUidMap() {
+void Set::buildUIDMap() {
   card_uids.clear();
   FOR_EACH(c, cards) {
     while (card_uids.find(c->uid) != card_uids.end()) {
@@ -201,7 +201,7 @@ void Set::validate(Version file_app_version) {
   // update scripts
   script_manager->updateAll();
   // build uid map
-  buildUidMap();
+  buildUIDMap();
 }
 
 void reflect_version_check(Reader& handler, const Char* key, intrusive_ptr<Packaged> const& package) {

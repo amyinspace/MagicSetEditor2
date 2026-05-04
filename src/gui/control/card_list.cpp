@@ -320,11 +320,14 @@ bool CardListBase::parseUrl(String& url, vector<CardP>& out) {
 bool CardListBase::parseFiles(wxArrayString& filenames, vector<CardP>& out) {
   size_t j = out.size();
   for (size_t i = 0; i < filenames.size(); i++) {
-    // if it's an image file, try to get meta_data
-    Image image_file;
-    image_file.SetLoadFlags(image_file.GetLoadFlags() & ~wxImage::Load_Verbose);
-    if (image_file.LoadFile(filenames[i])) {
-      parseImage(image_file, out);
+    if (wxImage::CanRead(filenames[i])) {
+      // if it's an image file, try to get meta_data
+      Image image_file;
+      image_file.SetLoadFlags(image_file.GetLoadFlags() & ~wxImage::Load_Verbose);
+      if (image_file.LoadFile(filenames[i])) {
+        parseImage(image_file, out);
+      }
+      else queue_message(MESSAGE_ERROR, _ERROR_("can't load image"));
     } else {
       // if it's an url, request the data
       std::ifstream ifs(filenames[i].ToStdString());
@@ -653,7 +656,8 @@ void CardListBase::onChar(wxKeyEvent& ev) {
   }
 }
 
-void CardListBase::onBeginDrag(wxListEvent&) {
+void CardListBase::onBeginDrag(wxListEvent& ev) {
+  ev.Skip();
   drop_timer.Start(200, wxTIMER_ONE_SHOT);
 }
 

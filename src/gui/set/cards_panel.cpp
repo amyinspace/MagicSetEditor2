@@ -656,6 +656,7 @@ CardP CardsPanel::selectedCard() const {
 void CardsPanel::selectCard(const CardP& card) {
   if (!set) return; // we want onChangeSet first
 
+  card_list->SetFocus();
   card_list->setCard(card);
 
   editor->setCard(card);

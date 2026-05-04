@@ -58,14 +58,15 @@ AddCardAction::AddCardAction(AddingOrRemoving ar, Set& set, const vector<CardP>&
       // Otherwise, if it's an existing card, create an action to copy the link
       else if (set.card_uids.find(linked_uid) != set.card_uids.end()) {
         CardP linked_card = set.card_uids.at(linked_uid);
-        int linked_index = linked_card->findFreeLink(new_uid, set.card_uids);
-        if (linked_index < 0) {
+        int selected_index = linked_card->findUIDLink(old_uid);
+        if (selected_index < 0) continue;
+        int free_index = linked_card->findFreeLink(new_uid, set.card_uids);
+        if (free_index < 0) {
           queue_message(MESSAGE_WARNING, _ERROR_1_("not enough free links", linked_card->identification()));
+          continue;
         }
-        else {
-          String relation(linked_card->getLinkedRelation(linked_index));
-          card_link_actions.push_back(make_intrusive<OneWayLinkCardsAction>(linked_card, new_uid, relation, linked_index));
-        }
+        String selected_relation(linked_card->getLinkedRelation(selected_index));
+        card_link_actions.push_back(make_intrusive<OneWayLinkCardsAction>(linked_card, new_uid, selected_relation, free_index));
       }
     }
   }
@@ -83,7 +84,7 @@ void AddCardAction::perform(bool to_undo) {
     card_link_actions[i]->perform(to_undo);
   }
   // Update uid map
-  set.buildUidMap();
+  set.buildUIDMap();
 }
 
 // ----------------------------------------------------------------------------- : Reorder cards
@@ -245,7 +246,7 @@ void ChangeCardUIDAction::perform(bool to_undo) {
     c->updateLinkedUID(card->uid, uid);
   }
   swap(card->uid, uid);
-  set.buildUidMap();
+  set.buildUIDMap();
 }
 
 // ----------------------------------------------------------------------------- : Pack types

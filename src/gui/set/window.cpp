@@ -309,7 +309,7 @@ void SetWindow::onChangeSet() {
   // make sure there is always at least one card
   // some things need this
   if (set->cards.empty()) set->cards.push_back(make_intrusive<Card>(*set->game));
-  set->buildUidMap();
+  set->buildUIDMap();
   // all panels view the same set
   FOR_EACH(p, panels) {
     p->setSet(set);

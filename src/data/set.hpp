@@ -73,7 +73,7 @@ public:
   /// Update scripts that were delayed
   void updateDelayed();
   /// Update uid map
-  void buildUidMap();
+  void buildUIDMap();
   /// A context for performing scripts
   /** Should only be used from the thumbnail thread! */
   Context& getContextForThumbnails();
