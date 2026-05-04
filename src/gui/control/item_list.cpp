@@ -16,7 +16,7 @@
 ItemList::ItemList(Window* parent, int id, long additional_style, bool multi_sel)
   : wxListView(parent, id, wxDefaultPosition, wxDefaultSize, additional_style | wxLC_REPORT | wxLC_VIRTUAL | (multi_sel ? 0 : wxLC_SINGLE_SEL))
   , selected_item_pos(-1)
-  , sort_by_column(-1), sort_ascending(true)
+  , sort_by_column(-1), sort_by_column2(-1), sort_by_column3(-1), sort_ascending(true)
 {
   // create image list
   wxImageList* il = new wxImageList(18,14);
@@ -263,6 +263,8 @@ void ItemList::onColumnClick(wxListEvent& ev) {
       new_sort_by_column = -1;  // 3rd click on same column -> don't sort
     }
   } else {
+    sort_by_column3 = sort_by_column2;
+    sort_by_column2 = sort_by_column;
     sort_ascending = true;
   }
   sortBy(new_sort_by_column, sort_ascending);

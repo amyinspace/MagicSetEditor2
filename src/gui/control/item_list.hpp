@@ -107,6 +107,8 @@ protected:
   VoidP          selected_item;     ///< The currently selected item
   long           selected_item_pos; ///< Position of the selected item in the sorted_list, or -1 if no card is selected
   long           sort_by_column;    ///< Column to use for sorting, or -1 if not sorted
+  long           sort_by_column2;   ///< Previous column used for sorting, or -1 if not sorted
+  long           sort_by_column3;   ///< Previous previous column used for sorting, or -1 if not sorted (stable sort aint workin so we doing this I guess)
   bool           sort_ascending;    ///< Sort order
   vector<VoidP>  sorted_list;       ///< Sorted list of items, can be considered a map: pos->item
   

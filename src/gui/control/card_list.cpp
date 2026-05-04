@@ -481,7 +481,23 @@ bool CardListBase::compareItems(void* a, void* b) const {
   // compare sort keys
   int cmp = smart_compare( va->getSortKey(), vb->getSortKey() );
   if (cmp != 0) return cmp < 0;
-  // equal values, compare alternate sort key
+  // equal values, compare alternate sort keys
+  if (sort_by_column2 != sort_by_column && sort_by_column2 >= 0) {
+    FieldP sort_field2 = column_fields[sort_by_column2];
+    ValueP va2 = reinterpret_cast<Card*>(a)->data[sort_field2];
+    ValueP vb2 = reinterpret_cast<Card*>(b)->data[sort_field2];
+    assert(va2 && vb2);
+    int cmp = smart_compare( va2->getSortKey(), vb2->getSortKey() );
+    if (cmp != 0) return cmp < 0;
+    if (sort_by_column3 != sort_by_column && sort_by_column3 != sort_by_column2 && sort_by_column3 >= 0) {
+      FieldP sort_field3 = column_fields[sort_by_column3];
+      ValueP va3 = reinterpret_cast<Card*>(a)->data[sort_field3];
+      ValueP vb3 = reinterpret_cast<Card*>(b)->data[sort_field3];
+      assert(va3 && vb3);
+      int cmp = smart_compare( va3->getSortKey(), vb3->getSortKey() );
+      if (cmp != 0) return cmp < 0;
+    }
+  }
   if (alternate_sort_field) {
     ValueP va = reinterpret_cast<Card*>(a)->data[alternate_sort_field];
     ValueP vb = reinterpret_cast<Card*>(b)->data[alternate_sort_field];
@@ -521,6 +537,8 @@ void CardListBase::rebuild() {
   GameSettings& gs = settings.gameSettingsFor(*set->game);
   sort_ascending = gs.sort_cards_ascending;
   sort_by_column = -1;
+  sort_by_column2 = -1;
+  sort_by_column3 = -1;
   long i = 0;
   FOR_EACH(f, column_fields) {
     if (f->name == gs.sort_cards_by) {
