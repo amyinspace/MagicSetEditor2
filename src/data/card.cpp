@@ -67,7 +67,7 @@ bool Card::contains(QuickFilterPart const& query) const {
   return false;
 }
 
-vector<int> Card::findFreeLinks(vector<String>& linked_uids, const unordered_set<String>& all_existing_uids) {
+vector<int> Card::findFreeLinks(vector<String>& linked_uids, const unordered_map<String, CardP>& all_existing_uids) {
   vector<int> freeIndexes;
   int count = min(4, (int)linked_uids.size());
   LINK_PAIRS(linked_pairs, this);
@@ -109,7 +109,7 @@ vector<int> Card::findFreeLinks(vector<String>& linked_uids, const unordered_set
   }
   return freeIndexes;
 }
-int Card::findFreeLink(const String& linked_uid, const unordered_set<String>& all_existing_uids) {
+int Card::findFreeLink(const String& linked_uid, const unordered_map<String, CardP>& all_existing_uids) {
   vector<String> linked_uids { linked_uid };
   return findFreeLinks(linked_uids, all_existing_uids)[0];
 }
@@ -155,12 +155,26 @@ void Card::updateLinkedUID(const String& old_uid, const String& new_uid) {
   if (index >= 0) getLinkedUID(index) = new_uid;
 }
 
-vector<CardP> Card::getLinkedRelationCards(const vector<CardP>& cards, const String& linked_relation, bool erase_if_no_card) {
+//vector<CardP> Card::getLinkedRelationCards(const vector<CardP>& cards, const String& linked_relation, bool erase_if_no_card) {
+//  vector<CardP> other_cards;
+//  vector<int> indexes = findRelationLinks(linked_relation);
+//  for (size_t i = 0; i < indexes.size(); ++i) {
+//    String& linked_uid = getLinkedUID(indexes[i]);
+//    CardP other_card = getUIDCard(cards, linked_uid);
+//    if (other_card) other_cards.push_back(other_card);
+//    else if (erase_if_no_card) {
+//      linked_uid = _("");
+//      getLinkedRelation(indexes[i]) = _("");
+//    }
+//  }
+//  return other_cards;
+//}
+vector<CardP> Card::getLinkedRelationCards(const Set& set, const String& linked_relation, bool erase_if_no_card) {
   vector<CardP> other_cards;
   vector<int> indexes = findRelationLinks(linked_relation);
   for (size_t i = 0; i < indexes.size(); ++i) {
     String& linked_uid = getLinkedUID(indexes[i]);
-    CardP other_card = getUIDCard(cards, linked_uid);
+    CardP other_card = getUIDCard(set, linked_uid);
     if (other_card) other_cards.push_back(other_card);
     else if (erase_if_no_card) {
       linked_uid = _("");
@@ -169,51 +183,76 @@ vector<CardP> Card::getLinkedRelationCards(const vector<CardP>& cards, const Str
   }
   return other_cards;
 }
-vector<CardP> Card::getLinkedRelationCards(const Set& set, const String& linked_relation, bool erase_if_no_card) {
-  return getLinkedRelationCards(set.cards, linked_relation, erase_if_no_card);
-}
 
-vector<pair<CardP, String>> Card::getLinkedCards(const vector<CardP>& cards) {
-  unordered_map<String, String> links{
-    { linked_card_1, linked_relation_1 },
-    { linked_card_2, linked_relation_2 },
-    { linked_card_3, linked_relation_3 },
-    { linked_card_4, linked_relation_4 }
-  };
+//vector<pair<CardP, String>> Card::getLinkedCards(const vector<CardP>& cards) {
+//  unordered_map<String, String> links{
+//    { linked_card_1, linked_relation_1 },
+//    { linked_card_2, linked_relation_2 },
+//    { linked_card_3, linked_relation_3 },
+//    { linked_card_4, linked_relation_4 }
+//  };
+//  vector<pair<CardP, String>> linked_cards;
+//  FOR_EACH(other_card, cards) {
+//    if (links.find(other_card->uid) != links.end()) {
+//      linked_cards.push_back(make_pair(other_card, links.at(other_card->uid)));
+//    }
+//  }
+//  return linked_cards;
+//}
+vector<pair<CardP, String>> Card::getLinkedCards(const Set& set) {
   vector<pair<CardP, String>> linked_cards;
-  FOR_EACH(other_card, cards) {
-    if (links.find(other_card->uid) != links.end()) {
-      linked_cards.push_back(make_pair(other_card, links.at(other_card->uid)));
-    }
+  CardP other_card_1 = getUIDCard(set, linked_card_1);
+  if (other_card_1) {
+    linked_cards.push_back(make_pair(other_card_1, linked_relation_1));
+  }
+  CardP other_card_2 = getUIDCard(set, linked_card_2);
+  if (other_card_2) {
+    linked_cards.push_back(make_pair(other_card_2, linked_relation_2));
+  }
+  CardP other_card_3 = getUIDCard(set, linked_card_3);
+  if (other_card_3) {
+    linked_cards.push_back(make_pair(other_card_3, linked_relation_3));
+  }
+  CardP other_card_4 = getUIDCard(set, linked_card_4);
+  if (other_card_4) {
+    linked_cards.push_back(make_pair(other_card_4, linked_relation_4));
   }
   return linked_cards;
 }
-vector<pair<CardP, String>> Card::getLinkedCards(const Set& set) {
-  return getLinkedCards(set.cards);
-}
 
-CardP Card::getLinkedOtherFaceCard(const vector<CardP>& cards) {
-  unordered_set<String> faces;
-  if (linked_relation_1 == _("Front Face") || linked_relation_1 == _("Back Face")) faces.emplace(linked_card_1);
-  if (linked_relation_2 == _("Front Face") || linked_relation_2 == _("Back Face")) faces.emplace(linked_card_2);
-  if (linked_relation_3 == _("Front Face") || linked_relation_3 == _("Back Face")) faces.emplace(linked_card_3);
-  if (linked_relation_4 == _("Front Face") || linked_relation_4 == _("Back Face")) faces.emplace(linked_card_4);
-  FOR_EACH(other_card, cards) {
-    if (faces.find(other_card->uid) != faces.end()) return other_card;
+//CardP Card::getLinkedOtherFaceCard(const vector<CardP>& cards) {
+//  unordered_set<String> faces;
+//  if (linked_relation_1 == _("Front Face") || linked_relation_1 == _("Back Face")) faces.emplace(linked_card_1);
+//  if (linked_relation_2 == _("Front Face") || linked_relation_2 == _("Back Face")) faces.emplace(linked_card_2);
+//  if (linked_relation_3 == _("Front Face") || linked_relation_3 == _("Back Face")) faces.emplace(linked_card_3);
+//  if (linked_relation_4 == _("Front Face") || linked_relation_4 == _("Back Face")) faces.emplace(linked_card_4);
+//  FOR_EACH(other_card, cards) {
+//    if (faces.find(other_card->uid) != faces.end()) return other_card;
+//  }
+//  return nullptr;
+//}
+CardP Card::getLinkedOtherFaceCard(const Set& set) {
+  if (linked_relation_1 == _("Front Face") || linked_relation_1 == _("Back Face")) {
+    CardP other_card_1 = getUIDCard(set, linked_card_1);
+    if (other_card_1) return other_card_1;
+  }
+  if (linked_relation_2 == _("Front Face") || linked_relation_2 == _("Back Face")) {
+    CardP other_card_2 = getUIDCard(set, linked_card_2);
+    if (other_card_2) return other_card_2;
+  }
+  if (linked_relation_3 == _("Front Face") || linked_relation_3 == _("Back Face")) {
+    CardP other_card_3 = getUIDCard(set, linked_card_3);
+    if (other_card_3) return other_card_3;
+  }
+  if (linked_relation_4 == _("Front Face") || linked_relation_4 == _("Back Face")) {
+    CardP other_card_4 = getUIDCard(set, linked_card_4);
+    if (other_card_4) return other_card_4;
   }
   return nullptr;
 }
-CardP Card::getLinkedOtherFaceCard(const Set& set) {
-  return getLinkedOtherFaceCard(set.cards);
-}
 
 void Card::addLink(const Set& set, CardP& linked_card, const String& selected_relation, const String& linked_relation) {
-  unordered_set<String> all_existing_uids;
-  FOR_EACH(card, set.cards) {
-    all_existing_uids.insert(card->uid);
-  }
-
-  int index = findFreeLink(linked_card->uid, all_existing_uids);
+  int index = findFreeLink(linked_card->uid, set.card_uids);
   if (index < 0) {
     queue_message(MESSAGE_ERROR, _ERROR_1_("not enough free links", identification()));
     return;
@@ -221,7 +260,7 @@ void Card::addLink(const Set& set, CardP& linked_card, const String& selected_re
   getLinkedUID(index) = linked_card->uid;
   getLinkedRelation(index) = linked_relation;
 
-  index = linked_card->findFreeLink(uid, all_existing_uids);
+  index = linked_card->findFreeLink(uid, set.card_uids);
   if (index < 0) {
     queue_message(MESSAGE_ERROR, _ERROR_1_("not enough free links", linked_card->identification()));
   }
@@ -246,14 +285,18 @@ void Card::removeLink(const CardP& linked_card)
   }
 }
 
-CardP Card::getUIDCard(const vector<CardP>& cards, const String& uid) {
-  FOR_EACH(card, cards) {
-    if (card->uid == uid) return card;
+//CardP Card::getUIDCard(const vector<CardP>& cards, const String& uid) {
+//  FOR_EACH(card, cards) {
+//    if (card->uid == uid) return card;
+//  }
+//  return nullptr;
+//}
+CardP Card::getUIDCard(const Set& set, const String& uid) {
+  auto it = set.card_uids.find(uid);
+  if (it != set.card_uids.end()) {
+    return it->second;
   }
   return nullptr;
-}
-CardP Card::getUIDCard(const Set& set, const String& uid) {
-  return getUIDCard(set.cards, uid);
 }
 
 IndexMap<FieldP, ValueP>& Card::extraDataFor(const StyleSheet& stylesheet) {

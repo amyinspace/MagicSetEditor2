@@ -45,21 +45,22 @@ public:
   Set(const StyleSheetP& stylesheet);
   ~Set();
 
-  GameP                    game;              ///< The game this set uses
-  StyleSheetP              stylesheet;        ///< The default stylesheet
+  GameP                           game;              ///< The game this set uses
+  StyleSheetP                     stylesheet;        ///< The default stylesheet
   /// The values on the fields of the set
   /** The indices should correspond to the set_fields in the Game */
-  IndexMap<FieldP, ValueP> data;
+  IndexMap<FieldP, ValueP>        data;
   /// Extra values for specific stylesheets, indexed by stylesheet name
   DelayedIndexMaps<FieldP,ValueP> styling_data;
-  vector<CardP>            cards;             ///< The cards in the set
-  vector<KeywordP>         keywords;          ///< Additional keywords used in this set
-  vector<PackTypeP>        pack_types;        ///< Additional/replacement pack types
-  String                   apprentice_code;   ///< Code to use for apprentice (magic only)
-
-  ActionStack              actions;           ///< Actions performed on this set and the cards in it
-  KeywordDatabase          keyword_db;        ///< Database for matching keywords, must be cleared when keywords change
-  VCSP                     vcs;               ///< The version control system to use
+  vector<CardP>                   cards;             ///< The cards in the set
+  unordered_map<String, CardP>    card_uids;         ///< The uids of the cards in the set
+  vector<KeywordP>                keywords;          ///< Additional keywords used in this set
+  vector<PackTypeP>               pack_types;        ///< Additional/replacement pack types
+  String                          apprentice_code;   ///< Code to use for apprentice (magic only)
+  
+  ActionStack                     actions;           ///< Actions performed on this set and the cards in it
+  KeywordDatabase                 keyword_db;        ///< Database for matching keywords, must be cleared when keywords change
+  VCSP                            vcs;               ///< The version control system to use
   
   /// A context for performing scripts
   /** Should only be used from the main thread! */
@@ -71,6 +72,8 @@ public:
   void updateStyles(const CardP& card, bool only_content_dependent);
   /// Update scripts that were delayed
   void updateDelayed();
+  /// Update uid map
+  void buildUidMap();
   /// A context for performing scripts
   /** Should only be used from the thumbnail thread! */
   Context& getContextForThumbnails();

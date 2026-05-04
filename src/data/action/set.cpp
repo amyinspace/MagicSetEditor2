@@ -30,13 +30,6 @@ AddCardAction::AddCardAction(AddingOrRemoving ar, Set& set, const vector<CardP>&
   // We always assume uid conflicts occur because a card was copy-pasted into the same set,
   // and never because two different cards randomly got assigned the same uid
   if (!action.adding) return;
-  // Tally existing unique ids
-  unordered_map<String, CardP> all_existing_cards;
-  unordered_set<String> all_existing_uids;
-  FOR_EACH(card, set.cards) {
-    all_existing_cards.insert({ card->uid, card });
-    all_existing_uids.insert(card->uid);
-  }
   // Tally added unique ids
   unordered_map<String, CardP> all_added_uids;
   for (size_t pos = 0; pos < action.steps.size(); ++pos) {
@@ -49,7 +42,7 @@ AddCardAction::AddCardAction(AddingOrRemoving ar, Set& set, const vector<CardP>&
     String old_uid = added_pair.first;
     CardP added_card = added_pair.second;
     // Assign new unique id if necessary
-    if (all_existing_cards.find(old_uid) == all_existing_cards.end()) continue;
+    if (set.card_uids.find(old_uid) == set.card_uids.end()) continue;
     String new_uid = generate_uid();
     added_card->uid = new_uid;
     all_added_uids.insert({ new_uid, added_card });
@@ -58,14 +51,14 @@ AddCardAction::AddCardAction(AddingOrRemoving ar, Set& set, const vector<CardP>&
     FOR_EACH(linked_pair, linked_pairs) {
       String& linked_uid = linked_pair.first.get();
       if (linked_uid.empty()) continue;
-      // If it's an added card, replace the link
+      // If it's an added card, update the link
       if (all_added_uids.find(linked_uid) != all_added_uids.end()) {
         all_added_uids.at(linked_uid)->updateLinkedUID(old_uid, new_uid);
       }
       // Otherwise, if it's an existing card, create an action to copy the link
-      else if (all_existing_cards.find(linked_uid) != all_existing_cards.end()) {
-        CardP linked_card = all_existing_cards.at(linked_uid);
-        int linked_index = linked_card->findFreeLink(new_uid, all_existing_uids);
+      else if (set.card_uids.find(linked_uid) != set.card_uids.end()) {
+        CardP linked_card = set.card_uids.at(linked_uid);
+        int linked_index = linked_card->findFreeLink(new_uid, set.card_uids);
         if (linked_index < 0) {
           queue_message(MESSAGE_WARNING, _ERROR_1_("not enough free links", linked_card->identification()));
         }
@@ -89,6 +82,8 @@ void AddCardAction::perform(bool to_undo) {
   for (size_t i = 0; i < card_link_actions.size(); ++i) {
     card_link_actions[i]->perform(to_undo);
   }
+  // Update uid map
+  set.buildUidMap();
 }
 
 // ----------------------------------------------------------------------------- : Reorder cards
@@ -250,6 +245,7 @@ void ChangeCardUIDAction::perform(bool to_undo) {
     c->updateLinkedUID(card->uid, uid);
   }
   swap(card->uid, uid);
+  set.buildUidMap();
 }
 
 // ----------------------------------------------------------------------------- : Pack types

@@ -447,12 +447,8 @@ bool CardListBase::canLink() const {
   vector<CardP> selected_cards;
   getSelection(selected_cards);
   if (selected_cards.size() != 1) return false;
-  unordered_set<String> all_existing_uids;
-  FOR_EACH(card, set->cards) {
-    all_existing_uids.insert(card->uid);
-  }
   CardP card = selected_cards[0];
-  return card->findFreeLink(card->uid, all_existing_uids) >= 0;
+  return card->findFreeLink(card->uid, set->card_uids) >= 0;
 }
 bool CardListBase::doLink() {
   CardLinkWindow wnd(this, set, getCard());

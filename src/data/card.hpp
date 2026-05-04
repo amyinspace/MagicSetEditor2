@@ -106,8 +106,8 @@ public:
   }
 
   /// Find the index of a free link slot to write to. Returns -1 if not found.
-  int         findFreeLink (const String&   linked_uid,  const unordered_set<String>& all_existing_uids);
-  vector<int> findFreeLinks(vector<String>& linked_uids, const unordered_set<String>& all_existing_uids);
+  int         findFreeLink (const String&   linked_uid,  const unordered_map<String, CardP>& all_existing_uids);
+  vector<int> findFreeLinks(vector<String>& linked_uids, const unordered_map<String, CardP>& all_existing_uids);
   
   /// Find the index of a link slot that references the linked_uid. Returns -1 if not found.
   int findUIDLink(const String& linked_uid);
@@ -125,18 +125,18 @@ public:
   //void updateLinkedRelation(const String& old_relation, const String& new_relation);
 
   /// Get the card with the given uid.
-  static CardP getUIDCard(const vector<CardP>& cards, const String& uid);
+  //static CardP getUIDCard(const vector<CardP>& cards, const String& uid);
   static CardP getUIDCard(const Set& set,             const String& uid);
   /// Get all the cards linked to this card with the given relation.
-  vector<CardP> getLinkedRelationCards(const vector<CardP>& cards, const String& linked_relation, bool erase_if_no_card = true);
+  //vector<CardP> getLinkedRelationCards(const vector<CardP>& cards, const String& linked_relation, bool erase_if_no_card = true);
   vector<CardP> getLinkedRelationCards(const Set& set,             const String& linked_relation, bool erase_if_no_card = true);
 
   /// Get all the cards linked to this card.
-  vector<pair<CardP, String>> getLinkedCards(const vector<CardP>& cards);
+  //vector<pair<CardP, String>> getLinkedCards(const vector<CardP>& cards);
   vector<pair<CardP, String>> getLinkedCards(const Set& set);
 
   /// Get the back face or front face of this card.
-  CardP getLinkedOtherFaceCard(const vector<CardP>& cards);
+  //CardP getLinkedOtherFaceCard(const vector<CardP>& cards);
   CardP getLinkedOtherFaceCard(const Set& set);
 
   /// Link a card to this card.

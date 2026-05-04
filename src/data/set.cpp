@@ -22,6 +22,7 @@
 #include <util/tagged_string.hpp> // for 0.2.7 fix
 #include <util/order_cache.hpp>
 #include <util/delayed_index_maps.hpp>
+#include <util/uid.hpp>
 #include <script/script_manager.hpp>
 #include <script/profiler.hpp>
 #include <wx/sstream.h>
@@ -66,6 +67,16 @@ void Set::updateStyles(const CardP& card, bool only_content_dependent) {
 }
 void Set::updateDelayed() {
   script_manager->updateDelayed();
+}
+void Set::buildUidMap() {
+  card_uids.clear();
+  FOR_EACH(c, cards) {
+    while (card_uids.find(c->uid) != card_uids.end()) {
+      queue_message(MESSAGE_WARNING, _("Multiple cards found with same uid:\n") + c->identification() + _("\n") + card_uids[c->uid]->identification() + _("\nPlease notify someone on the Discord server."));
+      c->uid = generate_uid();
+    }
+    card_uids[c->uid] = c;
+  }
 }
 
 Context& Set::getContextForThumbnails() {
@@ -189,6 +200,8 @@ void Set::validate(Version file_app_version) {
   if (cards.empty()) cards.push_back(make_intrusive<Card>(*game));
   // update scripts
   script_manager->updateAll();
+  // build uid map
+  buildUidMap();
 }
 
 void reflect_version_check(Reader& handler, const Char* key, intrusive_ptr<Packaged> const& package) {
