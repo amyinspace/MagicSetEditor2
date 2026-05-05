@@ -110,9 +110,9 @@ RealRect intersect(const RealRect& a, const RealRect& b) {
 void TextViewer::drawSelection(RotatedDC& dc, const TextStyle& style, size_t sel_start, size_t sel_end) {
   if (sel_start == sel_end) return;
   if (sel_end < sel_start) swap(sel_start, sel_end);
-  dc.SetBrush(*wxBLACK_BRUSH);
+  dc.SetBrush(*wxWHITE_BRUSH);
   dc.SetPen(*wxTRANSPARENT_PEN);
-  dc.SetLogicalFunction(wxINVERT);
+  dc.SetLogicalFunction(wxXOR);
   RealRect prev_rect(0,0,0,0);
   FOR_EACH(l, lines) {
     RealRect rect = l.selectionRectangle(dc, sel_start, sel_end);
