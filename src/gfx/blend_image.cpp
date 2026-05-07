@@ -19,7 +19,7 @@ template <typename T> inline T sqr(T x) { return x * x; }
 void linear_blend(Image& img1, const Image& img2, double x1,double y1, double x2,double y2) {
   int width = img1.GetWidth(), height = img1.GetHeight();
   if (img2.GetWidth() != width || img2.GetHeight() != height) {
-    throw Error(_ERROR_1_("blending different sizes", "linear_blend"));
+    throw Error(_ERROR_3_("blending different sizes", "linear_blend", String()<<width<<_("x")<<height, String()<<img2.GetWidth()<<_("x")<<img2.GetHeight()));
   }
   
   const int fixed = 1<<16; // fixed point multiplier
@@ -82,10 +82,10 @@ void linear_blend(Image& img1, const Image& img2, double x1,double y1, double x2
 void mask_blend(Image& img1, const Image& img2, const Image& mask) {
   int width = img1.GetWidth(), height = img1.GetHeight();
   if (img2.GetWidth() != width || img2.GetHeight() != height) {
-    throw Error(_("Images used for blending in masked_blend function must have the same size"));
+    throw Error(_ERROR_3_("blending different sizes", "masked_blend", String()<<width<<_("x")<<height, String()<<img2.GetWidth()<<_("x")<<img2.GetHeight()));
   }
   if (mask.GetWidth() != width || mask.GetHeight() != height) {
-    throw Error(_("Mask used for blending in masked_blend function must have the same size as the images"));
+    throw Error(_ERROR_3_("blending different mask", "masked_blend", String()<<width<<_("x")<<height, String()<<mask.GetWidth()<<_("x")<<mask.GetHeight()));
   }
 
   UInt size = width * height;
@@ -124,17 +124,18 @@ void set_alpha(Image& img, const Image& img_alpha) {
 }
 
 void set_alpha(Image& img, Byte* al, const wxSize& alpha_size) {
-  if (img.GetWidth() != alpha_size.GetWidth() || img.GetHeight() != alpha_size.GetHeight()) {
-    throw Error(_("Image must have same size as mask"));
+  int width = img.GetWidth(), height = img.GetHeight();
+  if (width != alpha_size.GetWidth() || height != alpha_size.GetHeight()) {
+    throw Error(_ERROR_3_("blending different mask", "set_alpha", String()<<width<<_("x")<<height, String()<<alpha_size.GetWidth()<<_("x")<<alpha_size.GetHeight()));
   }
   if (!img.HasAlpha()) {
     // copy
     img.InitAlpha();
-    memcpy(img.GetAlpha(), al, img.GetWidth() * img.GetHeight());
+    memcpy(img.GetAlpha(), al, width * height);
   } else{
     // merge
     Byte *im = img.GetAlpha();
-    size_t size = img.GetWidth() * img.GetHeight();
+    size_t size = width * height;
     for (size_t i = 0 ; i < size ; ++i) {
       im[i] = (im[i] * al[i]) / 255;
     }

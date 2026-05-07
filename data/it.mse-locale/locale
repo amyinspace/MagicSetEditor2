@@ -1048,7 +1048,8 @@ error:
 
 	# image stuff
 	coordinates for blending overlap:	Le coordinate per la fusione si sovrappongono.
-	blending different sizes:			Le immagini utilizzate per la fusione devono avere le stesse dimensioni nella funzione '%s'.
+	blending different sizes:			Le immagini utilizzate per la fusione devono avere le stesse dimensioni nella funzione '%s'. (Una è %s, l'altra è %s)
+	blending different mask:			L'immagine e la maschera utilizzate per la fusione devono avere le stesse dimensioni nella funzione '%s'. (L'immagine è %s, la maschera è %s)
 	negative image width:				Immagine con larghezza zero o negativa creata nella funzione '%s'.
 	negative image height:				Immagine con altezza zero o negativa creata nella funzione '%s'.
 	can't load image:					Impossibile caricare l'immagine. Assicurarsi che il formato effettivo dell'immagine corrisponda all'estensione salvata.

@@ -1189,7 +1189,9 @@ error:
 	# image stuff
 	coordinates for blending overlap:	Współrzędne scalania (blending) nachodzą na siebie
 	#TODO: Localize
-	blending different sizes:			Images used for blending must have the same size in function '%s'
+	blending different sizes:			Images used for blending must have the same size in function '%s' (one is %s, the other is %s)
+	#TODO: Localize
+	blending different mask:			Image and mask used for blending must have the same size in function '%s' (image is %s, mask is %s)
 	#TODO: Localize
 	negative image width:				Image with zero or negative width created in function '%s'
 	#TODO: Localize

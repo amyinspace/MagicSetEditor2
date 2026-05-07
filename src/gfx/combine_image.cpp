@@ -449,13 +449,14 @@ void combine_image_do(Image& a, Image b) {
 
 void combine_image(Image& a, const Image& b, ImageCombine combine) {
   // Images must have same size
-  if (a.GetWidth() != b.GetWidth() || a.GetHeight() != b.GetHeight()) {
-    throw Error(_ERROR_1_("blending different sizes", "combine_blend"));
+  int width = a.GetWidth(), height = a.GetHeight();
+  if (b.GetWidth() != width || b.GetHeight() != height) {
+    throw Error(_ERROR_3_("blending different sizes", "combine_blend", String()<<width<<_("x")<<height, String()<<b.GetWidth()<<_("x")<<b.GetHeight()));
   }
   // Copy alpha channel?
   if (b.HasAlpha()) {
     if (!a.HasAlpha()) a.InitAlpha();
-    memcpy(a.GetAlpha(), b.GetAlpha(), a.GetWidth() * a.GetHeight());
+    memcpy(a.GetAlpha(), b.GetAlpha(), width * height);
   }
   // Combine image data, by dispatching to combineImageDo
   switch(combine) {

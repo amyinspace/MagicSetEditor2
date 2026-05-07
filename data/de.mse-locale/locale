@@ -1048,7 +1048,8 @@ error:
 
 	# image stuff
 	coordinates for blending overlap:	Die Koordinaten für die Überblendung überlappen sich.
-	blending different sizes:			Die für die Überblendung verwendeten Bilder müssen in der Funktion '%s' die gleiche Größe haben.
+	blending different sizes:			Die für die Überblendung verwendeten Bilder müssen in der Funktion '%s' die gleiche Größe haben. (Eines ist %s, das andere ist %s)
+	blending different mask:			Bild und Maske, die zum Überblenden verwendet werden, müssen in der Funktion '%s' die gleiche Größe haben. (Bild ist %s, Maske ist %s)
 	negative image width:				Bild mit Breite Null oder negativer Breite, erstellt in der Funktion '%s'
 	negative image height:				Bild mit Höhe Null oder negativer Höhe, erstellt in der Funktion '%s'
 	can't load image:					Bild konnte nicht geladen werden. Stelle sicher, dass das tatsächliche Format des Bildes mit der gespeicherten Dateiendung übereinstimmt.

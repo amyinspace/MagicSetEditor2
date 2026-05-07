@@ -1048,7 +1048,8 @@ error:
 
 	# image stuff
 	coordinates for blending overlap:	Les coordonnées pour le mélange sont superposées. Espacez-les.
-	blending different sizes:			Les images utilisées pour le mélange doivent avoir la même taille dans la fonction '%s'.
+	blending different sizes:			Les images utilisées pour le mélange doivent avoir la même taille dans la fonction '%s'. (L'une est %s, l'autre est %s)
+	blending different mask:			L'image et le masque utilisés pour le mélange doivent avoir la même taille dans la fonction '%s'. (L'image est %s, le masque est %s)
 	negative image width:				Image de largeur nulle ou négative créée par la fonction '%s'
 	negative image height:				Image de hauteur nulle ou négative créée par la fonction '%s'
 	can't load image:					Échec du chargement de l'image. Assurez-vous que le format réel de l'image corresponde à son extension enregistrée.
