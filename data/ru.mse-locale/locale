@@ -55,6 +55,8 @@ menu:
 	next card:							Следующая карта	PgDn
 	search cards:						Найти карты	Ctrl+K
 	add card:							Добавить карту	Ctrl+Enter
+	#TODO: Localize
+	add card double:					&Add Double Faced Card	Ctrl+Shift+Enter
 	add cards:							Добавить несколько карт...
 	remove card:						Удалить выделенную карту
 	#TODO: Localize
@@ -219,6 +221,8 @@ help:
 	next card:							Выбрать следующую карту в списке
 	search cards:						Отфильтруйте список карточек с помощью условий поиска
 	add card:							Добавить новую карту в текущий сет
+	#TODO: Localize
+	add card double:					Add a new, blank, card that has a back face to this set
 	add cards:							Добавить несколько новых карт в текущий сет
 	remove card:						Удалить выбранную карту из текущего сета
 	#TODO: Localize
@@ -490,6 +494,8 @@ tooltip:
 
 	# cards toolbar
 	add card:							Добавить карту
+	#TODO: Localize
+	add card double:					Add double faced card
 	remove card:						Удалить выделенную карту
 	#TODO: Localize
 	link card:							Link cards to selected card

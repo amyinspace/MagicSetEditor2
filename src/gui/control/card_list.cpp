@@ -210,8 +210,14 @@ bool CardListBase::doDelete() {
   vector<CardP> cards_to_delete;
   getSelection(cards_to_delete);
   if (cards_to_delete.empty()) return false;
+  // if there is one double faced card, select the other face to make it clear it hasn't been deleted
+  CardP other_face = nullptr;
+  if (cards_to_delete.size() == 1) {
+    other_face = cards_to_delete[0]->getLinkedOtherFaceCard(*set);
+  }
   // delete cards
   set->actions.addAction(make_unique<AddCardAction>(REMOVE, *set, cards_to_delete));
+  if (other_face) setCard(other_face, true);
   return true;
 }
 
@@ -738,6 +744,7 @@ void CardListBase::onContextMenu(wxContextMenuEvent&) {
     add_menu_item_tr(&m, wxID_PASTE, "paste", "paste_card");
     m.AppendSeparator();
     add_menu_item_tr(&m, ID_CARD_ADD, "card_add", "add card");
+    add_menu_item_tr(&m, ID_CARD_ADD_DOUBLE, "card_add_double", "add card double");
     add_menu_item_tr(&m, ID_CARD_REMOVE, "card_del", "remove card");
     add_menu_item_tr(&m, ID_CARD_LINK, settings.darkModePrefix() + "card_link", "link card");
     PopupMenu(&m);

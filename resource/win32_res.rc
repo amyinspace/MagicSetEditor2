@@ -66,6 +66,7 @@ tool/dark_reminder IMAGE "tool/dark_reminder.png"
 tool/no_auto IMAGE "tool/no_auto.png"
 
 tool/card_add IMAGE "tool/card_add.png"
+tool/card_add_double IMAGE "tool/card_add_double.png"
 tool/card_add_multiple IMAGE "tool/card_add_multiple.png"
 tool/card_modify_multiple IMAGE "tool/card_modify_multiple.png"
 tool/card_del IMAGE "tool/card_del.png"

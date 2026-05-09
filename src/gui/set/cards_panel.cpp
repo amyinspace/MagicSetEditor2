@@ -127,13 +127,14 @@ CardsPanel::CardsPanel(Window* parent, int id)
     add_menu_item_tr(menuCard, ID_CARD_NEXT, nullptr, "next card");
     add_menu_item_tr(menuCard, ID_CARD_SEARCH, nullptr, "search cards");
     menuCard->AppendSeparator();
+    add_menu_item_tr(menuCard, ID_CARD_ADD, "card_add", "add_card");
+    add_menu_item_tr(menuCard, ID_CARD_ADD_DOUBLE, "card_add_double", "add_card_double");
     insertManyCardsMenu = add_menu_item_tr(menuCard, ID_CARD_ADD_MULT, "card_add_multiple", "add cards");
     // NOTE: space after "Del" prevents wx from making del an accellerator
     // otherwise we delete a card when delete is pressed inside the editor
     // Adding a space never hurts, please keep it just to be safe.
     add_menu_item(menuCard, ID_CARD_ADD_CSV, "card_add_multiple", _MENU_("add card csv") + _(" "), _HELP_("add card csv"));
     add_menu_item(menuCard, ID_CARD_ADD_JSON, "card_add_multiple", _MENU_("add card json") + _(" "), _HELP_("add card json"));
-    add_menu_item_tr(menuCard, ID_CARD_ADD, "card_add", "add_card");
     add_menu_item(menuCard, ID_CARD_REMOVE, "card_del", _MENU_("remove card")+_(" "), _HELP_("remove card"));
     add_menu_item(menuCard, ID_CARD_LINK, settings.darkModePrefix() + "card_link", _MENU_("link card") + _(" "), _HELP_("link card"));
     add_menu_item(menuCard, ID_CARD_AND_LINK_COPY, "card_copy", _MENU_("copy card and links") + _(" "), _HELP_("copy card and links"));
@@ -255,7 +256,7 @@ void CardsPanel::onChangeSet() {
   insertManyCardsMenu->SetSubMenu(makeAddCardsSubmenu(false));
   // re-add the menu
   menuCard->Remove(ID_CARD_ADD_MULT);
-  ((wxMenu*)menuCard)->Insert(4,insertManyCardsMenu); // HACK: the position is hardcoded
+  ((wxMenu*)menuCard)->Insert(6,insertManyCardsMenu); // HACK: the position is hardcoded
   // also for the toolbar dropdown menu
   if (toolAddCard) {
     // Originally this was using the menu directly, but there are compatibility issues apparently.
@@ -270,6 +271,7 @@ wxMenu* CardsPanel::makeAddCardsSubmenu(bool add_single_card_option) {
   if (add_single_card_option) {
     cards_scripts_menu = new wxMenu();
     add_menu_item_tr(cards_scripts_menu, ID_CARD_ADD, "card_add", "add_card");
+    add_menu_item_tr(cards_scripts_menu, ID_CARD_ADD_DOUBLE, "card_add_double", "add_card_double");
     cards_scripts_menu->AppendSeparator();
   }
   // create menu for add_cards_scripts
@@ -435,6 +437,17 @@ void CardsPanel::onCommand(int id) {
     case ID_CARD_ADD:
       set->actions.addAction(make_unique<AddCardAction>(*set));
       break;
+    case ID_CARD_ADD_DOUBLE: {
+      vector<CardP> cards;
+      cards.push_back(make_intrusive<Card>(*set->game));
+      cards.push_back(make_intrusive<Card>(*set->game));
+      cards[0]->linked_card_1 = cards[1]->uid;
+      cards[1]->linked_card_1 = cards[0]->uid;
+      cards[0]->linked_relation_1 = "Back Face";
+      cards[1]->linked_relation_1 = "Front Face";
+      set->actions.addAction(make_unique<AddCardAction>(ADD, *set, cards));
+      break;
+    }
     case ID_CARD_ADD_CSV:
       card_list->doAddCSV();
       break;
