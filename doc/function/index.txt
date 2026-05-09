@@ -109,6 +109,7 @@ These functions are built into the program, other [[type:function]]s can be defi
 	
 ! Cards				<<<
 | [[fun:new_card]]		Construct a new [[type:card]] object.
+| [[fun:new_uid]]		Construct a new uid.
 | [[fun:add_card_to_set]]		Add a [[type:card]] to a [[type:set]].
 | [[fun:get_card_styling]]		Get the styling data of a [[type:card]].
 | [[fun:get_card_stylesheet]]	Get the stylesheet of a [[type:card]].

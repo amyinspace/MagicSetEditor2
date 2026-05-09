@@ -19,6 +19,7 @@
 #include <data/game.hpp>
 #include <data/stylesheet.hpp>
 #include <data/card.hpp>
+#include <util/uid.hpp>
 #include <util/error.hpp>
 
 // ----------------------------------------------------------------------------- : new_card
@@ -168,9 +169,20 @@ SCRIPT_FUNCTION(add_card_to_set) {
   SCRIPT_RETURN(false);
 }
 
+SCRIPT_FUNCTION(new_uid) {
+  SCRIPT_PARAM_C(Set*, set);
+  String uid = generate_uid();
+  for (int i = 0; i < 100; i++) {
+    if (set->card_uids.find(uid) == set->card_uids.end()) break;
+    uid = generate_uid();
+  }
+  SCRIPT_RETURN(uid);
+}
+
 // ----------------------------------------------------------------------------- : Init
 
 void init_script_construction_functions(Context& ctx) {
   ctx.setVariable(_("new_card"), script_new_card);
+  ctx.setVariable(_("new_uid"), script_new_uid);
   ctx.setVariable(_("add_card_to_set"), script_add_card_to_set);
 }
