@@ -161,23 +161,29 @@ KeywordP KeywordDataObject::getKeyword(const SetP& set) {
 // ----------------------------------------------------------------------------- : Card on clipboard
 
 CardsOnClipboard::CardsOnClipboard(const SetP& set, const String id, const vector<CardP>& cards) {
+  wxBusyCursor busy;
   // Conversion to image file
   if (cards.size() < 6) {
+    Bitmap bmp;
     Image img;
     if (cards.size() == 1) {
-      img = export_image(set, cards[0]);
+      img = export_image(set, cards[0], true, 1.0, 0.0, 0.0, &bmp);
     }
     else {
       img = export_image(set, cards);
+      bmp = Bitmap(img);
     }
-    String temp_path = wxFileName::CreateTempFileName(_("mse")) + _(".png");
-    img.SaveFile(temp_path, wxBITMAP_TYPE_PNG);
-    wxFileDataObject* fileData = new wxFileDataObject();
-    fileData->AddFile(temp_path);
-    Add(fileData);
-    wxImageDataObject* imgData = new wxImageDataObject();
+    //wxFileDataObject* fileData = new wxFileDataObject(); // needed for pasting on desktop, but slow
+    //String temp_path = wxFileName::CreateTempFileName(_("mse")) + _(".png");
+    //img.SaveFile(temp_path, wxBITMAP_TYPE_PNG);
+    //fileData->AddFile(temp_path);
+    //Add(fileData);
+    wxImageDataObject* imgData = new wxImageDataObject(); // needed for metadata
     imgData->SetImage(img);
     Add(imgData);
+    wxBitmapDataObject* bmpData = new wxBitmapDataObject(); // needed for pasting in MSPaint
+    bmpData->SetBitmap(bmp);
+    Add(bmpData);
   }
   // Conversion to serialized card format
   Add(new CardsDataObject(set, id, cards), true);

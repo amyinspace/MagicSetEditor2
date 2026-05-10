@@ -107,6 +107,7 @@ public:
     } else {
       ok = wxTheClipboard->SetData(new wxTextDataObject(msg.text));
     }
+    wxTheClipboard->Flush();
     wxTheClipboard->Close();
     return ok;
   }

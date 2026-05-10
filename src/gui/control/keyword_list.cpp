@@ -109,6 +109,7 @@ bool KeywordList::doCopy() {
   if (!canCopy()) return false;
   if (!wxTheClipboard->Open()) return false;
   bool ok = wxTheClipboard->SetData(new KeywordDataObject(set, getKeyword())); // ignore result
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   return ok;
 }
@@ -125,6 +126,7 @@ bool KeywordList::doPaste() {
   if (!wxTheClipboard->Open()) return false;
   KeywordDataObject data;
   bool ok = wxTheClipboard->GetData(data);
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   if (!ok) return false;
   // add keyword to set

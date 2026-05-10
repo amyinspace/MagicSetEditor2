@@ -783,6 +783,7 @@ bool TextValueEditor::doPaste() {
   if (!wxTheClipboard->Open()) return false;
   wxTextDataObject data;
   bool ok = wxTheClipboard->GetData(data);
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   if (!ok) return false;
   // paste
@@ -801,6 +802,7 @@ bool TextValueEditor::doCopy() {
   // set data
   if (!wxTheClipboard->Open()) return false;
   bool ok = wxTheClipboard->SetData(new wxTextDataObject(str));
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   return ok;
 }

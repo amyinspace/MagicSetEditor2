@@ -35,7 +35,7 @@ Rotation ZoomedUnrotatedDataViewer::getRotation() const {
 
 // ----------------------------------------------------------------------------- : wxImage export
 
-Image export_image(const SetP& set, const CardP& card, bool write_metadata, double zoom, Radians angle_radians, double bleed_pixels) {
+Image export_image(const SetP& set, const CardP& card, bool write_metadata, double zoom, Radians angle_radians, double bleed_pixels, Bitmap* out_bitmap) {
   if (!set) throw Error(_("no set"));
   /// create and zoom
   ZoomedUnrotatedDataViewer viewer = ZoomedUnrotatedDataViewer(zoom);
@@ -51,6 +51,9 @@ Image export_image(const SetP& set, const CardP& card, bool write_metadata, doub
   viewer.draw(dc);
   dc.SelectObject(wxNullBitmap);
   Image img = bitmap.ConvertToImage();
+
+  /// return bitmap if needed
+  if (out_bitmap) *out_bitmap = std::move(bitmap);
 
   /// rotate
   img = rotate_image(img, angle_radians);
@@ -218,8 +221,7 @@ void export_image(const SetP& set, const CardP& card, const String& filename) {
   img.SaveFile(filename);
 }
 
-void export_image(const SetP& set, const vector<CardP>& cards, const String& path, const String& filename_template, FilenameConflicts conflicts)
-{
+void export_image(const SetP& set, const vector<CardP>& cards, const String& path, const String& filename_template, FilenameConflicts conflicts) {
   wxBusyCursor busy;
   // Script
   ScriptP filename_script = parse(filename_template, nullptr, true);

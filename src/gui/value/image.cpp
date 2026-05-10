@@ -93,6 +93,7 @@ bool ImageValueEditor::doCopy() {
   // set data
   if (!wxTheClipboard->Open()) return false;
   bool ok = wxTheClipboard->SetData(new wxBitmapDataObject(image));
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   return ok;
 }
@@ -102,6 +103,7 @@ bool ImageValueEditor::doPaste() {
   if (!wxTheClipboard->Open()) return false;
   wxBitmapDataObject data;
   bool ok = wxTheClipboard->GetData(data);
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   if (!ok)  return false;
   // slice

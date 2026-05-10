@@ -166,6 +166,7 @@ bool CardListBase::doCopy() {
   // put on clipboard
   if (!wxTheClipboard->Open()) return false;
   bool ok = wxTheClipboard->SetData(new CardsOnClipboard(set, _(""), cards_to_copy)); // ignore result
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   return ok;
 }
@@ -192,6 +193,7 @@ bool CardListBase::doCopyCardAndLinkedCards() {
     }
   }
   bool ok = wxTheClipboard->SetData(new CardsOnClipboard(set, _(""), cards_to_copy)); // ignore result
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   return ok;
 }
@@ -200,6 +202,7 @@ bool CardListBase::doPaste() {
   if (!canPaste()) return false;
   if (!wxTheClipboard->Open()) return false;
   bool ok = wxTheClipboard->GetData(*drop_target->data_object);
+  wxTheClipboard->Flush();
   wxTheClipboard->Close();
   if (ok) return parseData(false);
   return false;
