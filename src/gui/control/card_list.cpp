@@ -302,21 +302,14 @@ bool CardListBase::parseUrl(String& url, vector<CardP>& out) {
     url = url.substr(pos+4);
   }
   if (!url.StartsWith(_("http"))) return false;
-
+  
   WebRequestWindow wnd(url);
   if (wnd.ShowModal() == wxID_OK) {
-    const String& content_type = wnd.out.GetContentType();
-    if (content_type.StartsWith(_("image"))) {
-      Image img(*wnd.out.GetStream());
-      if (img.IsOk()) {
-        parseImage(img, out);
-      }
-      else {
-        queue_message(MESSAGE_ERROR, _ERROR_("web request corrupted"));
-      }
+    if (wnd.content_type.StartsWith(_("image/"))) {
+      parseImage(wnd.image_out, out);
     }
-    else if (content_type.StartsWith(_("text"))) {
-      String text = wnd.out.AsString();
+    else if (wnd.content_type.StartsWith(_("text/"))) {
+      String text = String(wnd.text_out.data(), wnd.text_out.size());
       parseText(text, out);
     }
     else {
@@ -369,6 +362,9 @@ bool CardListBase::parseImage(Image& image, vector<CardP>& out) {
 }
 
 bool CardListBase::parseText(String& text, vector<CardP>& out) {
+  if (text.size() == 0) {
+    return false;
+  }
   size_t j = out.size();
   size_t pos = text.find("<mse-card-data>");
   if (pos != wxString::npos) {
@@ -388,7 +384,7 @@ bool CardListBase::parseText(String& text, vector<CardP>& out) {
       out.push_back(make_intrusive<Card>(*c->getValue()));
     }
   } catch (...) {}
-
+  
   // decode images to populate image fields
   for (int k = j; k < out.size(); k++) {
     CardP& card = out[k];
@@ -407,18 +403,24 @@ bool CardListBase::parseData(bool ignore_cards_from_own_card_list) {
   if (format == CardsDataObject::format) {
     String id = ignore_cards_from_own_card_list ? drop_target->ignored_id : _("");
     size_t size = composite->GetDataSize(format);
-    if (size > 0) {
-      std::vector<char> buffer(size);
-      if (composite->GetDataHere(format, buffer.data())) {
-        CardsDataObject card_data;
-        card_data.SetData(size, buffer.data());
-        card_data.getCards(set, id, new_cards);
-      }
+    if (size < 1) {
+      queue_message(MESSAGE_ERROR, _("DEBUG: CardsDataObject corrupted"));
+      return false;
+    }
+    if (size > 10000000) { // 10Mb
+      queue_message(MESSAGE_ERROR, _("Too much card data, paste less cards!"));
+      return false;
+    }
+    std::vector<char> buffer(size);
+    if (composite->GetDataHere(format, buffer.data())) {
+      CardsDataObject card_data;
+      card_data.SetData(size, buffer.data());
+      card_data.getCards(set, id, new_cards);
     }
   }
   else {
     wxDataObject *data = composite->GetObject(format);
-
+    
     switch (format.GetType())
     {
       case wxDF_FILENAME:
@@ -432,17 +434,59 @@ bool CardListBase::parseData(bool ignore_cards_from_own_card_list) {
       case wxDF_PNG:
       {
         wxImageDataObject* image_data = static_cast<wxImageDataObject*>(data);
-        Image image = image_data->GetImage();
-        parseImage(image, new_cards);
+        size_t size = image_data->GetDataSize();
+        if (size < 1) {
+          queue_message(MESSAGE_ERROR, _("DEBUG: ImageDataObject corrupted"));
+          return false;
+        }
+        if (size > 50000000) { // 50Mb
+          queue_message(MESSAGE_ERROR, _("Image data too large or corrupted"));
+          return false;
+        }
+        try {
+          Image image = image_data->GetImage();
+          if (!image.IsOk() || image.GetWidth() > 20000 || image.GetHeight() > 20000) {
+            queue_message(MESSAGE_ERROR, _("Image too large or corrupted"));
+            return false;
+          }
+          parseImage(image, new_cards);
+        } catch (const std::bad_alloc&) {
+          //queue_message(MESSAGE_ERROR, _("Image couldn't be allocated"));
+          return false;
+        } catch (...) {
+          queue_message(MESSAGE_ERROR, _("Image couldn't be processed"));
+          return false;
+        }
       }
       break;
 
       case wxDF_BITMAP:
       {
         wxBitmapDataObject* bitmap_data = static_cast<wxBitmapDataObject*>(data);
-        wxBitmap bitmap = bitmap_data->GetBitmap();
-        Image image = bitmap.ConvertToImage();
-        parseImage(image, new_cards);
+        size_t size = bitmap_data->GetDataSize();
+        if (size < 1) {
+          queue_message(MESSAGE_ERROR, _("DEBUG: BitmapDataObject corrupted"));
+          return false;
+        }
+        if (size > 50000000) { // 50Mb
+          queue_message(MESSAGE_ERROR, _("Bitmap data too large or corrupted"));
+          return false;
+        }
+        try {
+          wxBitmap bitmap = bitmap_data->GetBitmap();
+          if (!bitmap.IsOk() || bitmap.GetWidth() > 20000 || bitmap.GetHeight() > 20000) {
+            queue_message(MESSAGE_ERROR, _("Bitmap too large or corrupted"));
+            return false;
+          }
+          Image image = bitmap.ConvertToImage();
+          parseImage(image, new_cards);
+        } catch (const std::bad_alloc&) {
+          //queue_message(MESSAGE_ERROR, _("Bitmap or Image couldn't be allocated"));
+          return false;
+        } catch (...) {
+          queue_message(MESSAGE_ERROR, _("Bitmap or Image couldn't be processed"));
+          return false;
+        }
       }
       break;
 
@@ -451,6 +495,15 @@ bool CardListBase::parseData(bool ignore_cards_from_own_card_list) {
       case wxDF_HTML:
       {
         wxTextDataObject* text_data = static_cast<wxTextDataObject*>(data);
+        size_t size = text_data->GetDataSize();
+        if (size < 1) {
+          queue_message(MESSAGE_ERROR, _("DEBUG: TextDataObject corrupted"));
+          return false;
+        }
+        if (size > 30000000) { // 30Mb
+          queue_message(MESSAGE_ERROR, _("Text too large or corrupted"));
+          return false;
+        }
         String text = text_data->GetText();
         if (!parseUrl(text, new_cards)) parseText(text, new_cards);
       }
