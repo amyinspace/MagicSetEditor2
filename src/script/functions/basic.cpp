@@ -90,6 +90,14 @@ SCRIPT_FUNCTION(error) {
   return script_nil;
 }
 
+SCRIPT_FUNCTION(exists_as_package) {
+  SCRIPT_PARAM_C(String, input);
+  Version version_out;
+  bool result = package_manager.installedVersion(input, version_out);
+  if (!result) return script_nil;
+  SCRIPT_RETURN(version_out.toString());
+}
+
 SCRIPT_FUNCTION(exists_in_package) {
   SCRIPT_PARAM_C(String, input);
   bool result = package_manager.existsInPackage(input);
@@ -1018,6 +1026,7 @@ void init_script_basic_functions(Context& ctx) {
   ctx.setVariable(_("trace"),                     script_trace);
   ctx.setVariable(_("warning"),                   script_warning);
   ctx.setVariable(_("error"),                     script_error);
+  ctx.setVariable(_("exists_as_package"),         script_exists_as_package);
   ctx.setVariable(_("exists_in_package"),         script_exists_in_package);
   // conversion
   ctx.setVariable(_("to_string"),                 script_to_string);
