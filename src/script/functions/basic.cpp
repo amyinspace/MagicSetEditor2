@@ -90,6 +90,14 @@ SCRIPT_FUNCTION(error) {
   return script_nil;
 }
 
+SCRIPT_FUNCTION(version_is_older) {
+  SCRIPT_PARAM_C(String, input);
+  SCRIPT_PARAM(String, than);
+  Version input_version = Version::fromString(input);
+  Version than_version = Version::fromString(than);
+  SCRIPT_RETURN(input_version < than_version);
+}
+
 SCRIPT_FUNCTION(exists_as_package) {
   SCRIPT_PARAM_C(String, input);
   Version version_out;
@@ -1026,6 +1034,7 @@ void init_script_basic_functions(Context& ctx) {
   ctx.setVariable(_("trace"),                     script_trace);
   ctx.setVariable(_("warning"),                   script_warning);
   ctx.setVariable(_("error"),                     script_error);
+  ctx.setVariable(_("version_is_older"),          script_version_is_older);
   ctx.setVariable(_("exists_as_package"),         script_exists_as_package);
   ctx.setVariable(_("exists_in_package"),         script_exists_in_package);
   // conversion
