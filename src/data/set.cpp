@@ -224,10 +224,11 @@ void Set::validate(Version file_app_version) {
   // update cards with stylesheet update_cards_scripts
   for (int i = 0; i < cards.size(); ++i) {
     CardP& card = cards[i];
-    StyleSheetP stylesheet = stylesheetForP(card);
+    StyleSheetP stylesheet = card->stylesheet ? card->stylesheet : stylesheetForP(card);
+    Version stylesheet_version = card->stylesheet_version.isZero() ? this->stylesheet_version : card->stylesheet_version;
     for (int j = 0; j < stylesheet->update_cards_scripts.size(); ++j) {
       UpdateCardsScriptP& script = stylesheet->update_cards_scripts[j];
-      if (card->stylesheet_version >= script->before_version) continue;
+      if (stylesheet_version >= script->before_version) continue;
       vector<CardP> new_cards = script->perform(*this, card);
       if (!new_cards.empty()) {
         FOR_EACH(new_card, new_cards) {
