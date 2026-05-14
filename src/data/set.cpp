@@ -214,17 +214,17 @@ void Set::validate(Version file_app_version) {
   // then apply the second game script, etc...
   Version previous_cutoff = Version();
   Version current_cutoff = Version();
-  for (int g = 0; g < game->update_cards_scripts.size() + 1; ++g) {
+  for (size_t g = 0; g < game->update_cards_scripts.size() + 1; ++g) {
     bool last_iteration = g == game->update_cards_scripts.size();
-    UpdateCardsScriptP& game_script = last_iteration ? nullptr : game->update_cards_scripts[g];
+    UpdateCardsScriptP game_script = last_iteration ? nullptr : game->update_cards_scripts[g];
     previous_cutoff = current_cutoff;
     current_cutoff = last_iteration ? current_cutoff : game_script->before_version;
     // Apply stylesheet scripts that are older than the current game script
-    for (int i = 0; i < cards.size(); ++i) {
+    for (size_t i = 0; i < cards.size(); ++i) {
       CardP& card = cards[i];
       StyleSheetP stylesheet = card->stylesheet ? card->stylesheet : stylesheetForP(card);
       Version stylesheet_version = card->stylesheet_version.isZero() ? this->stylesheet_version : card->stylesheet_version;
-      for (int j = 0; j < stylesheet->update_cards_scripts.size(); ++j) {
+      for (size_t j = 0; j < stylesheet->update_cards_scripts.size(); ++j) {
         UpdateCardsScriptP& script = stylesheet->update_cards_scripts[j];
         if (script->before_version >= current_cutoff && !last_iteration) continue;
         if (script->before_version < previous_cutoff) continue;
