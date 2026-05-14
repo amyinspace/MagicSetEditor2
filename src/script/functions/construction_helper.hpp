@@ -64,7 +64,7 @@ inline static void set_container(Value* container, ScriptValueP& value, String k
   else if (PackageChoiceValue* pvalue = dynamic_cast<PackageChoiceValue*>(container)) {
     String package_name = value->toString();
     while (package_name.starts_with(_("/"))) package_name = package_name.substr(1);
-    pvalue->package_name = value->toString();
+    pvalue->package_name = package_name;
   }
   else if (ColorValue* cvalue = dynamic_cast<ColorValue*>(container)) {
     cvalue->value = value->toColor();
