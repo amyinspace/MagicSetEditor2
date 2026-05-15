@@ -19,15 +19,31 @@ class PackageUpdateList : public TreeList {
 public:
   PackageUpdateList(Window* parent, const InstallablePackages& packages, bool show_only_installable, int id = wxID_ANY);
   ~PackageUpdateList();
-  
-  inline InstallablePackageP getSelection() const {
-    return selection == NOTHING ? InstallablePackageP() : get(selection);
+
+  class TreeItem;
+
+  inline InstallablePackageP getSelectedPackage() const {
+    TreeItem* ti = getSelectedItem();
+    return ti ? ti->package : InstallablePackageP();
   }
-  
-  inline InstallablePackageP get(size_t item) const {
-    return static_pointer_cast<TreeItem>(items[item])->package;
+
+  inline bool selectionIsGroup() const {
+    TreeItem* ti = getSelectedItem();
+    return ti && !ti->package;
   }
-    
+
+  inline void forEachSelectedPackage(const std::function<void(const InstallablePackageP&)>& fn) const {
+    forEachPackage(getSelectedItem(), fn);
+  }
+
+  inline bool anySelectedPackage(const std::function<bool(const InstallablePackageP&)>& predicate) const {
+    return anyPackage(getSelectedItem(), predicate);
+  }
+
+  inline bool allSelectedPackages(const std::function<bool(const InstallablePackageP&)>& predicate) const {
+    return allPackages(getSelectedItem(), predicate);
+  }
+
 protected:
   // overridden methods from TreeList
   void initItems() override;
@@ -38,12 +54,48 @@ protected:
   int    columnWidth(size_t column) const override;
   
 private:
+  inline TreeItem* getSelectedItem() const {
+    return selection >= items.size() ? nullptr : static_pointer_cast<TreeItem>(items[selection]).get();
+  }
+  inline void forEachPackage(const TreeItem* item, const std::function<void(const InstallablePackageP&)>& fn) const {
+    if (!item) return;
+    if (item->package) {
+      fn(item->package);
+    }
+    for (const auto& child : item->children) {
+      forEachPackage(child.get(), fn);
+    }
+  }
+  inline bool anyPackage(const TreeItem* item, const std::function<bool(const InstallablePackageP&)>& predicate) const {
+    if (!item) return false;
+    if (item->package && predicate(item->package)) {
+      return true;
+    }
+    for (const auto& child : item->children) {
+      if (anyPackage(child.get(), predicate)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  inline bool allPackages(const TreeItem* item, const std::function<bool(const InstallablePackageP&)>& predicate) const {
+    if (!item) return false;
+    if (item->package && !predicate(item->package)) {
+      return false;
+    }
+    for (const auto& child : item->children) {
+      if (!allPackages(child.get(), predicate)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /// The list of packages we are displaying
   const InstallablePackages& packages;
   /// Show only packages with an installer?
   bool show_only_installable;
   
-  class TreeItem;
 public:
   typedef intrusive_ptr<TreeItem> TreeItemP;
 private:
