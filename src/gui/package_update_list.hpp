@@ -16,11 +16,13 @@
 
 /// A list of installed and downloadable packages
 class PackageUpdateList : public TreeList {
+private:
+  class TreeItem;
 public:
+  typedef intrusive_ptr<TreeItem> TreeItemP;
+
   PackageUpdateList(Window* parent, const InstallablePackages& packages, bool show_only_installable, int id = wxID_ANY);
   ~PackageUpdateList();
-
-  class TreeItem;
 
   inline InstallablePackageP getSelectedPackage() const {
     TreeItem* ti = getSelectedItem();
@@ -96,9 +98,6 @@ private:
   /// Show only packages with an installer?
   bool show_only_installable;
   
-public:
-  typedef intrusive_ptr<TreeItem> TreeItemP;
-private:
   class TreeItem : public Item {
   public:
     TreeItem() : position_type(TYPE_OTHER), position_hint(1000000) {}
