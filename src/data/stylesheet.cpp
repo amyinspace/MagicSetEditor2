@@ -38,21 +38,13 @@ StyleSheetP StyleSheet::byGameAndName(const Game& game, const String& name) {
       return package_manager.open<StyleSheet>(full_name);
     }
   } catch (PackageNotFoundError& e) {
-    queue_message(MESSAGE_ERROR, _("Missing stylesheet: ") + full_name);
-
-    // This causes a freeze when the set contains two cards that use the same missing StyleSheet, and the second one has styling_data
-    // Also, it's probably better to ask the user for an alternative for each missing StyleSheet individually
-    //if (stylesheet_for_reading()) {
-    //  // we already have a stylesheet higher up, so just return a null pointer
-    //  return StyleSheetP();
-    //}
-    
     // load an alternative stylesheet
-    StyleSheetP ss = select_stylesheet(game, name);
+    StyleSheetP ss = select_stylesheet(game, full_name);
     if (ss) {
       stylesheet_alternatives[full_name] = ss->relativeFilename();
       return ss;
     } else {
+      queue_message(MESSAGE_ERROR, _("Missing stylesheet: ") + full_name);
       throw e;
     }
   }
@@ -103,8 +95,8 @@ void mark_dependency_value(const StyleSheet& stylesheet, const Dependency& dep) 
 
 
 IMPLEMENT_REFLECTION(StyleSheet) {
-  REFLECT(game);
   REFLECT_BASE(Packaged);
+  REFLECT(game);
   REFLECT(card_width);
   REFLECT(card_height);
   REFLECT(card_dpi);

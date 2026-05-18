@@ -16,6 +16,7 @@
 #include <util/io/package_manager.hpp>
 #include <util/platform.hpp>
 #include <gui/util.hpp> // load_resource_image
+#include <wx/webrequest.h>
 #include <wx/filename.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
@@ -317,6 +318,27 @@ void InstallablePackage::determineStatus() {
     }
     #endif
   }
+}
+
+bool InstallablePackage::ensureIsDownloaded() {
+  if (!installer) return true; // Nothing to download
+  if (installer->installer) return true; // Already loaded
+  if (installer->installer_url.empty()) return false; // No URL
+  // download installer
+  wxWebRequestSync request = wxWebSessionSync::GetDefault().CreateRequest(installer->installer_url);
+  auto const result = request.Execute();
+  if (!result) {
+    throw Error(_ERROR_2_("can't download installer", description->name, installer->installer_url));
+  } 
+  wxInputStream* is(request.GetResponse().GetStream());
+  installer->installer_file = wxFileName::CreateTempFileName(_("mse-installer"));
+  wxFileOutputStream os(installer->installer_file);
+  os.Write(*is);
+  os.Close();
+  // open installer
+  installer->installer = make_intrusive<Installer>();
+  installer->installer->open(installer->installer_file);
+  return true;
 }
 
 bool InstallablePackage::willBeInstalled() const {

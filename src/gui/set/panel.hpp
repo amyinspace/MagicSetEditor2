@@ -24,8 +24,9 @@ class SetWindowPanel : public wxPanel, public SetView {
 public:
   SetWindowPanel(Window* parent, int id, bool autoTabbing = true);
   
-  /// We will probably want to respond to set changes
+  /// We will probably want to respond to set changes or package list changes
   virtual void onSetChange() {}
+  virtual void onPackageListChange() {}
   
 //  // --------------------------------------------------- : Meta information
 //  

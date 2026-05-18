@@ -301,8 +301,8 @@ CustomPackDialog::CustomPackDialog(Window* parent, const SetP& set, const PackTy
   totals->setGame(set->game);
   updateTotals();
   // set sizer
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
 }
 
 void CustomPackDialog::updateTotals() {
@@ -417,8 +417,8 @@ void RandomPackPanel::initControls() {
       s2->Add(s3, 0, wxEXPAND | (wxALL & ~wxTOP), 4);
       s2->Add(card_list, 1, wxEXPAND);
     s->Add(s2,      1, wxEXPAND, 8);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
 }
 
 RandomPackPanel::~RandomPackPanel() {

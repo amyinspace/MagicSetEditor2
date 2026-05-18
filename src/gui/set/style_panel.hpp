@@ -22,14 +22,16 @@ class StylingEditor;
 class StylePanel : public SetWindowPanel {
 public:
   StylePanel(Window* parent, int id);
-  
+
   void onChangeSet() override;
+  void onPackageListChange() override;
+  void onFilterChange();
   void onAction(const Action&, bool undone) override;
   
   // --------------------------------------------------- : UI
   
   void initUI(wxToolBar*, wxMenuBar*) override;
-  
+
   // --------------------------------------------------- : Clipboard
   bool canCut() const override;
   bool canCopy() const override;
@@ -61,7 +63,7 @@ private:
   void onUseCustom(wxCommandEvent&);
 
   void onStylesheetFilterUpdate(wxCommandEvent&);
-  
+
   /// Determine the best size for the list of stylesheets based on available space
   void updateListSize();
   bool Layout() override;

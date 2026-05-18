@@ -515,8 +515,8 @@ ConsolePanel::ConsolePanel(Window* parent, int id)
   // init sizer
   wxSizer* s = new wxBoxSizer(wxVERTICAL);
   s->Add(splitter, 1, wxEXPAND);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
 
   // init menus
   menuConsole = new wxMenu();

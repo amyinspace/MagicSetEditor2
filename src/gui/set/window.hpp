@@ -177,5 +177,7 @@ private:
   void onIdle                (wxIdleEvent&);
   
   void onSizeChange          (wxCommandEvent&);
+
+  void onPackageListChange   (wxCommandEvent&);
 };
 

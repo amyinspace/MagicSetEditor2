@@ -83,20 +83,30 @@ private:
   // gui items
   PackageList*  stylesheet_list;
 
-  FilterCtrl* stylesheet_filter;
-  String stylesheet_filter_value;
-    
+  FilterCtrl*   stylesheet_filter;
+  String        stylesheet_filter_value;
+
+  wxButton*     ok_button, *cancel_button;
+
+  wxButton*     find_online_button;
+  wxStaticText* find_online_status_text;
+  bool searching_online = false;
+  bool auto_installing  = false;
+  String failed_name;
+
   // --------------------------------------------------- : events
   
   void onStyleSheetSelect  (wxCommandEvent&);
   void onStyleSheetActivate(wxCommandEvent&);
   void onStylesheetFilterUpdate(wxCommandEvent&);
-    
+  void onFindOnline(wxCommandEvent&);
   virtual void OnOK(wxCommandEvent&);
   
   void onUpdateUI(wxUpdateUIEvent&);
   void onIdle(wxIdleEvent&);
-  
+
+  void tryAutoInstall();
+
   // we are done, close the window
   void done();
 };

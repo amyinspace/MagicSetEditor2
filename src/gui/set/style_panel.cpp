@@ -55,8 +55,8 @@ void StylePanel::initControls() {
         s4->Add(editor,             2, wxEXPAND, 0);
       s2->Add(s4, 1, wxEXPAND | wxALL, 2);
     s->Add(s2,      1, wxEXPAND, 8);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
 }
 
 void StylePanel::initUI(wxToolBar* tb, wxMenuBar* mb) {
@@ -95,12 +95,30 @@ bool StylePanel::Layout() {
 
 void StylePanel::onChangeSet() {
   if (!isInitialized()) return;
-  list->showData<StyleSheet>(set->game->name() + _("-*"));
+  list->showData<StyleSheet>(set->game->name() + _("*"));
   list->select(set->stylesheet->name(), false);
   editor->setSet(set);
   preview->setSet(set);
   card = CardP();
   use_for_all->Enable(false);
+}
+
+void StylePanel::onPackageListChange() {
+  if (!isInitialized()) return;
+  if (!list) return;
+  list->showData<StyleSheet>(set->game->name() + _("*"));
+  onFilterChange();
+}
+
+void StylePanel::onFilterChange() {
+  if (list->hasSelection()) {
+    StyleSheetP existingStylesheetSelection = list->getSelection<StyleSheet>(false);
+    list->setFilter(stylesheet_filter->getFilter<PackageData>());
+    list->select(existingStylesheetSelection->name());
+  }
+  else {
+    list->setFilter(stylesheet_filter->getFilter<PackageData>());
+  }
 }
 
 void StylePanel::onAction(const Action& action, bool undone) {
@@ -139,14 +157,7 @@ void StylePanel::onAction(const Action& action, bool undone) {
 }
 
 void StylePanel::onStylesheetFilterUpdate(wxCommandEvent&) {
-  if (list->hasSelection()) {
-    StyleSheetP existingStylesheetSelection = list->getSelection<StyleSheet>(false);
-    list->setFilter(stylesheet_filter->getFilter<PackageData>());
-    list->select(existingStylesheetSelection->name());
-  }
-  else {
-    list->setFilter(stylesheet_filter->getFilter<PackageData>());
-  }
+  onFilterChange();
 }
 
 // ----------------------------------------------------------------------------- : Selection

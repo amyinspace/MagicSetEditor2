@@ -118,8 +118,8 @@ CardsPanel::CardsPanel(Window* parent, int id)
               link_grid_4->Add(link_viewer_4,   wxGBPosition(1, 0), wxGBSpan(1, 2));
   s->Add(s_left,   0, wxEXPAND | wxRIGHT, 2);
   s->Add(splitter, 1, wxEXPAND);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
   
   // init menus
   menuCard = new wxMenu();

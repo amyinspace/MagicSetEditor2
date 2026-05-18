@@ -92,8 +92,8 @@ void KeywordsPanel::initControls() {
   // init sizer
   wxSizer* s = new wxBoxSizer(wxHORIZONTAL);
     s->Add(splitter, 1, wxEXPAND);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
   
   //s->Add(new wxStaticText(this, wxID_ANY, _("Sorry, no keywords for now"),wxDefaultPosition,wxDefaultSize,wxALIGN_CENTER), 1, wxALIGN_CENTER); // TODO: Remove
   /*  wxSizer* s2 = new wxBoxSizer(wxVERTICAL);

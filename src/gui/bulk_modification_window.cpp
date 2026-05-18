@@ -85,8 +85,8 @@ BulkModificationWindow::BulkModificationWindow(Window* parent, const SetP& set, 
     s1->AddButton(new wxButton(this, wxID_CANCEL));
     s1->Realize();
     s->Add(s1, 1, wxEXPAND | wxALL, 12);
-    s->SetSizeHints(this);
     SetSizer(s);
+    s->SetSizeHints(this);
     SetSize(600, 400);
     Layout();
   }

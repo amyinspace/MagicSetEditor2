@@ -68,12 +68,12 @@ public:
 
   /// Show a dialog to inform the user that updates are available (if there are any)
   /// Call check_updates first. Call this function from an onIdle loop
-  inline void show_update_dialog(Window* parent) {
+  inline void show_update_dialog(Window* set_window) {
     if (shown_dialog || check_status != FOUND) return; // we already have the latest version, or this has already been displayed.
     shown_dialog = true;
-    wxMessageDialog dial = wxMessageDialog(parent, _LABEL_("updates found"), _TITLE_("updates available"), wxYES_NO);
+    wxMessageDialog dial = wxMessageDialog(set_window, _LABEL_("updates found"), _TITLE_("updates available"), wxYES_NO);
     if (dial.ShowModal() == wxID_YES) {
-      (new PackagesWindow(parent))->Show();
+      (new PackagesWindow(set_window))->Show();
     }
   }
 

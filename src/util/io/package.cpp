@@ -227,7 +227,8 @@ unique_ptr<wxInputStream> Package::openIn(const String& file) {
   FileInfos::iterator it = files.find(normalize_internal_filename(file));
   if (it == files.end()) {
     // does it look like a relative filename?
-    if (size_t pos = filename.find(_(".mse-")) != String::npos) {
+    size_t pos = filename.find(_(".mse-"));
+    if (pos != String::npos) {
       // check for nested folder
       pos = filename.find_last_of(_("/\\"));
       String nestedFilename = filename + filename.SubString(pos, filename.size()) + wxFileName::GetPathSeparator() + file;
@@ -235,7 +236,7 @@ unique_ptr<wxInputStream> Package::openIn(const String& file) {
         throw PackageError(_ERROR_1_("nested folder", filename));
       }
       else {
-        throw PackageError(_ERROR_2_("file not found package like", file, filename));
+        throw PackageNotFoundError(_ERROR_2_("file not found package like", file, filename));
       }
     }
   }

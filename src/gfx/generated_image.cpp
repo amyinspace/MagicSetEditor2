@@ -816,8 +816,8 @@ ImportedImage::ImportedImage(Set* set, const String& filepath) {
   // determine save name
   loadpath = filepath;
   savename = normalize_internal_filename(loadpath);
-  savename.Replace(":",  "-");
-  savename.Replace("/",  "-");
+  savename.Replace(_(":"),  _("-"));
+  savename.Replace(_("/"),  _("-"));
 
   // does the file pointed to by filepath exist?
   if (!wxFileName(loadpath, wxPATH_UNIX).FileExists()) {

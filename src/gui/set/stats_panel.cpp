@@ -330,8 +330,8 @@ void StatsPanel::initControls() {
     s->Add(categories, 0, wxEXPAND | wxRIGHT, 2);
   #endif
   s->Add(splitter,   1, wxEXPAND);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
   
   // init menu
   menuGraph = new wxMenu();

@@ -18,7 +18,6 @@
 #include <data/settings.hpp>
 #include <gfx/gfx.hpp>
 #include <wx/wfstream.h>
-#include <wx/webrequest.h>
 #include <wx/dcbuffer.h>
 #include <wx/progdlg.h>
 #include <wx/tglbtn.h>
@@ -131,9 +130,7 @@ END_EVENT_TABLE()
 
 // ----------------------------------------------------------------------------- : PackagesWindow
 
-enum Action {
-  KEEP, INSTALL, UPGRADE, REMOVE
-};
+DEFINE_EVENT_TYPE(EVENT_PACKAGE_LIST_CHANGED);
 
 PackagesWindow::PackagesWindow(Window* parent, bool download_package_list)
   : waiting_for_list(download_package_list)
@@ -261,7 +258,7 @@ void PackagesWindow::onOk(wxCommandEvent& ev) {
     }
   }
   // anything to do?
-  if (!to_change) {
+  if (!to_change && !app_change) {
     ev.Skip();
     return;
   }
@@ -281,8 +278,6 @@ void PackagesWindow::onOk(wxCommandEvent& ev) {
     this,
     wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_SMOOTH | wxSTAY_ON_TOP
   );
-  // Clear package list
-  package_manager.reset();
   // Download installers
   int package_pos = 0, step = 0;
   FOR_EACH(ip, installable_packages) {
@@ -291,20 +286,7 @@ void PackagesWindow::onOk(wxCommandEvent& ev) {
       if (!progress.Update(step++, String::Format(_ERROR_("downloading updates"), ++package_pos, to_download))) {
         return; // aborted
       }
-      // download installer
-      wxWebRequestSync request = wxWebSessionSync::GetDefault().CreateRequest(ip->installer->installer_url);
-      auto const result = request.Execute();
-      if (!result) {
-        throw Error(_ERROR_2_("can't download installer", ip->description->name, ip->installer->installer_url));
-      } 
-      wxInputStream* is(request.GetResponse().GetStream());
-      ip->installer->installer_file = wxFileName::CreateTempFileName(_("mse-installer"));
-      wxFileOutputStream os(ip->installer->installer_file);
-      os.Write(*is);
-      os.Close();
-      // open installer
-      ip->installer->installer = make_intrusive<Installer>();
-      ip->installer->installer->open(ip->installer->installer_file);
+      ip->ensureIsDownloaded();
     }
   }
   // Install stuff
@@ -369,6 +351,8 @@ void PackagesWindow::onOk(wxCommandEvent& ev) {
     //  }
     //}
   }
+  // Notify that packages have changed
+  sendEvent();
   // Continue event propagation into the dialog window so that it closes.
   ev.Skip();
   //%% TODO: will we delete packages?
@@ -421,6 +405,9 @@ void PackagesWindow::onUpdateUI(wxUpdateUIEvent& ev) {
         package_list->allSelectedPackages([&](const InstallablePackageP& p) {
           return p->has(PACKAGE_ACT_REMOVE | where) ||
             (!p->has(PACKAGE_INSTALLED) && !p->has(PACKAGE_ACT_INSTALL));
+        }) &&
+        package_list->anySelectedPackage([&](const InstallablePackageP& p) {
+          return p->has(PACKAGE_ACT_REMOVE | where);
         })
       );
       w->Enable(
@@ -455,6 +442,11 @@ bool PackagesWindow::checkInstallerList(bool refresh) {
     UpdateWindowUI(wxUPDATE_UI_RECURSE);
   }
   return true;
+}
+
+void PackagesWindow::sendEvent() {
+  wxCommandEvent ev(EVENT_PACKAGE_LIST_CHANGED, GetId());
+  wxPostEvent(GetParent(), ev);
 }
 
 BEGIN_EVENT_TABLE(PackagesWindow, wxDialog)

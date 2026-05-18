@@ -51,5 +51,7 @@ private:
   /// Check whether we have downloaded the list of installers
   /** If the download is (partially) complete, update the installable_packages list */
   bool checkInstallerList(bool refresh = true);
+  /// Notify that the package list has changed
+  void sendEvent();
 };
 

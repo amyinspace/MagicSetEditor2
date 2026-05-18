@@ -125,8 +125,8 @@ PreferencesWindow::PreferencesWindow(Window* parent)
   s->Add(nb,                                 1, wxEXPAND | (wxALL & ~wxBOTTOM), 8);
   s->AddSpacer(4);
   s->Add(CreateButtonSizer(wxOK | wxCANCEL), 0, wxEXPAND | (wxALL & ~wxTOP),    8);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
 }
 
 void PreferencesWindow::onOk(wxCommandEvent&) {
@@ -177,7 +177,6 @@ GlobalPreferencesPage::GlobalPreferencesPage(Window* parent)
   dark_mode->SetSelection((int)settings.dark_mode_type);
   // init sizer
   wxSizer* s = new wxBoxSizer(wxVERTICAL);
-  s->SetSizeHints(this);
     wxSizer* s2 = new wxStaticBoxSizer(wxVERTICAL, this, _LABEL_("language"));
       s2->Add(new wxStaticText(this, wxID_ANY, _LABEL_("app language")), 0,             wxALL,           4);
       s2->Add(language,                                                  0, wxEXPAND | (wxALL & ~wxTOP), 4);
@@ -191,6 +190,7 @@ GlobalPreferencesPage::GlobalPreferencesPage(Window* parent)
       s4->Add(new wxStaticText(this, wxID_ANY, _HELP_( "app language")), 0,             wxALL,           4);
     s->Add(s4, 0, wxEXPAND | wxALL, 8);
   SetSizer(s);
+  s->SetSizeHints(this);
 }
 
 void GlobalPreferencesPage::store() {
@@ -243,8 +243,8 @@ DisplayPreferencesPage::DisplayPreferencesPage(Window* parent)
         s3->Add(new wxStaticText(this, wxID_ANY, _LABEL_("percent of normal")),1, wxALL & ~wxRIGHT, 4);
       s2->Add(s3, 0, wxEXPAND | wxALL, 4);
     s->Add(s2, 0, wxEXPAND | wxALL, 8);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
 }
 
 void DisplayPreferencesPage::store() {
@@ -342,8 +342,8 @@ TransfersPreferencesPage::TransfersPreferencesPage(Window* parent) : Preferences
     s->Add(s2, 0, wxEXPAND | wxALL, 8);
     s->Add(s5, 0, wxEXPAND | wxALL, 8);
   export_scale->SetFocus();
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
 }
 
 void TransfersPreferencesPage::store() {
@@ -375,8 +375,8 @@ DirsPreferencesPage::DirsPreferencesPage(Window* parent)
         s3->Add(ab,         0, wxEXPAND);
       s2->Add(s3, 0, wxEXPAND | (wxALL & ~wxTOP), 4);
     s->Add(s2, 0, wxEXPAND | wxALL, 8);
-  s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
 }
 
 void DirsPreferencesPage::store() {
@@ -441,13 +441,16 @@ void UpdatePreferencesPage::store() {
 }
 
 void UpdatePreferencesPage::onCheckUpdatesNow(wxCommandEvent&) {
+  downloadable_installers.shown_dialog = true;
   downloadable_installers.check_updates_now(false);
   if (downloadable_installers.check_status == DownloadableInstallerList::CheckStatus::FAILED) {
     wxMessageBox(_ERROR_("checking updates failed"), _TITLE_("update check"), wxICON_ERROR | wxOK);
   } else if (downloadable_installers.check_status == DownloadableInstallerList::CheckStatus::NOT_FOUND) {
     wxMessageBox(_ERROR_("no updates"),              _TITLE_("update check"), wxICON_INFORMATION | wxOK);
   } else {
-    (new PackagesWindow(GetParent()))->Show();
+    wxWindow* set_window = this;
+    while (set_window->GetParent()) set_window = set_window->GetParent();
+    (new PackagesWindow(set_window))->Show();
   }
 }
 

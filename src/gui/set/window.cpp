@@ -858,6 +858,12 @@ void SetWindow::onIdle(wxIdleEvent& ev) {
   downloadable_installers.show_update_dialog(this);
 }
 
+void SetWindow::onPackageListChange(wxCommandEvent&) {
+  FOR_EACH(p, panels) {
+    p->onPackageListChange();
+  }
+}
+
 // ----------------------------------------------------------------------------- : Event table
 
 BEGIN_EVENT_TABLE(SetWindow, wxFrame)
@@ -917,4 +923,5 @@ BEGIN_EVENT_TABLE(SetWindow, wxFrame)
   EVT_CARD_SELECT    (wxID_ANY,        SetWindow::onCardSelect)
   EVT_CARD_ACTIVATE  (wxID_ANY,        SetWindow::onCardActivate)
   EVT_SIZE_CHANGE    (wxID_ANY,        SetWindow::onSizeChange)
+  EVT_COMMAND        (wxID_ANY, EVENT_PACKAGE_LIST_CHANGED, SetWindow::onPackageListChange)
 END_EVENT_TABLE  ()

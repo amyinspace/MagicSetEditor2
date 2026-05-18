@@ -152,7 +152,8 @@ public:
   int           old_automatic;
   
   void determineStatus();
-  
+  bool ensureIsDownloaded();
+
   /// After the action, will the package be installed?
   bool willBeInstalled() const;
   

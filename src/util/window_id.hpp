@@ -336,5 +336,12 @@ enum ControlID {
   ID_CARD_LINK_RELATION_2,
   ID_CARD_LINK_RELATION_3,
   ID_CARD_LINK_RELATION_4,
+  // Select stylesheet window
+  ID_DOWNLOAD_STYLESHEET,
 };
+
+// ----------------------------------------------------------------------------- : Custom Events
+
+DECLARE_EVENT_TYPE(EVENT_PACKAGE_LIST_CHANGED, <not used>);
+
 

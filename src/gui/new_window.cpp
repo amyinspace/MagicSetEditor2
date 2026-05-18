@@ -10,6 +10,8 @@
 #include <gui/new_window.hpp>
 #include <gui/control/gallery_list.hpp>
 #include <gui/control/package_list.hpp>
+#include <gui/downloadable_installers.hpp>
+#include <data/installer.hpp>
 #include <data/game.hpp>
 #include <data/stylesheet.hpp>
 #include <data/set.hpp>
@@ -56,8 +58,8 @@ NewSetWindow::NewSetWindow(Window* parent)
     s->Add(s3, wxSizerFlags().Expand().Border(wxALL, 6));
     s->Add(stylesheet_list, 0, wxEXPAND | (wxALL & ~wxTOP), 4);
     s->Add(CreateButtonSizer(wxOK | wxCANCEL) , 0, wxEXPAND | wxALL, 8);
-    s->SetSizeHints(this);
   SetSizer(s);
+  s->SetSizeHints(this);
   // Resize
   Layout();
   wxSize min_size = GetSizer()->GetMinSize() + GetSize() - GetClientSize();
@@ -177,10 +179,15 @@ StyleSheetP select_stylesheet(const Game& game, const String& failed_name) {
 SelectStyleSheetWindow::SelectStyleSheetWindow(Window* parent, const Game& game, const String& failed_name)
   : wxDialog(parent, wxID_ANY, _TITLE_("select stylesheet"), wxDefaultPosition, wxSize(830,320), wxDEFAULT_DIALOG_STYLE)
   , game(game)
+  , failed_name(failed_name)
 {
   wxBusyCursor wait;
   // init controls
-  stylesheet_list = new PackageList (this, ID_STYLESHEET_LIST);
+  ok_button                     = new wxButton    (this, wxID_OK);
+  cancel_button                 = new wxButton    (this, wxID_CANCEL);
+  find_online_button            = new wxButton    (this, ID_DOWNLOAD_STYLESHEET, _BUTTON_("find package online"));
+  stylesheet_list               = new PackageList (this, ID_STYLESHEET_LIST);
+  find_online_status_text       = new wxStaticText(this, wxID_ANY, _(""));
   wxStaticText* description     = new wxStaticText(this, ID_GAME_LIST,       _LABEL_1_("stylesheet not found", failed_name));
   wxStaticText* stylesheet_text = new wxStaticText(this, ID_STYLESHEET_LIST, _LABEL_("style type"));
 
@@ -196,17 +203,25 @@ SelectStyleSheetWindow::SelectStyleSheetWindow(Window* parent, const Game& game,
       s2->Add(stylesheet_filter, 1, wxRIGHT, 4);
     s->Add(s2, wxSizerFlags().Expand().Border(wxALL, 6));
     s->Add(stylesheet_list, 0, wxEXPAND | (wxALL & ~wxTOP), 4);
-    s->Add(CreateButtonSizer(wxOK | wxCANCEL) , 0, wxEXPAND | wxALL, 8);
-    s->SetSizeHints(this);
+    wxBoxSizer* s3 = new wxBoxSizer(wxHORIZONTAL);
+      s3->Add(find_online_button, 0, wxRIGHT, 8);
+      s3->Add(find_online_status_text, 1, wxALIGN_CENTER_VERTICAL);
+      s3->AddStretchSpacer();
+      s3->Add(ok_button, 0, wxRIGHT, 4);
+      s3->Add(cancel_button, 0);
+    s->Add(s3, 0, wxEXPAND | wxALL, 8);
   SetSizer(s);
+  s->SetSizeHints(this);
   // init list
-  stylesheet_list->showData<StyleSheet>(game.name() + _("-*"));
+  stylesheet_list->showData<StyleSheet>(game.name() + _("*"));
   stylesheet_list->select(settings.gameSettingsFor(game).default_stylesheet);
   // Resize
   Layout();
   wxSize min_size = GetSizer()->GetMinSize() + GetSize() - GetClientSize();
   SetSize(830,min_size.y);
   UpdateWindowUI(wxUPDATE_UI_RECURSE);
+  // start downloading the installer list
+  downloadable_installers.download();
 }
 
 void SelectStyleSheetWindow::onStyleSheetSelect(wxCommandEvent&) {
@@ -228,6 +243,87 @@ void SelectStyleSheetWindow::onStylesheetFilterUpdate(wxCommandEvent&) {
   }
 }
 
+void SelectStyleSheetWindow::onFindOnline(wxCommandEvent&) {
+  if (searching_online) return;
+  searching_online = true;
+  find_online_status_text->SetLabel(_LABEL_("searching online"));
+  find_online_button->Enable(false);
+  //downloadable_installers.download();
+}
+
+void SelectStyleSheetWindow::tryAutoInstall() {
+  auto_installing = true;
+  searching_online = false;
+  wxBusyCursor busy;
+  // search for missing stylesheet
+  InstallablePackages packages;
+  package_manager.findAllInstalledPackages(packages);
+  FOR_EACH(inst, downloadable_installers.installers) {
+    merge(packages, inst);
+  }
+  FOR_EACH(p, packages) {
+    if (!p) continue;
+    p->determineStatus();
+  }
+  InstallablePackageP target;
+  FOR_EACH(p, packages) {
+    if (!p || !p->description) continue;
+    if (p->description->name == failed_name) {
+      target = p;
+      break;
+    }
+  }
+  if (!target) {
+    find_online_status_text->SetLabel(_LABEL_("searching online fail"));
+    auto_installing = false;
+    return;
+  }
+  try {
+    // update UI
+    find_online_status_text->SetLabel(_LABEL_("found online downloading"));
+    ok_button->Enable(false);
+    cancel_button->Enable(false);
+    stylesheet_list->Enable(false);
+    stylesheet_filter->Enable(false);
+    Layout();
+    Refresh();
+    Update();
+    wxSafeYield(this, true);
+    // resolve dependencies
+    PackageAction where = is_install_local(settings.install_type) ? PACKAGE_ACT_LOCAL : PACKAGE_ACT_GLOBAL;
+    bool action_ok = set_package_action(packages, target, PACKAGE_ACT_INSTALL | where);
+    if (!action_ok) throw Error(_("can't resolve dependencies"));
+    // download stylesheet and dependencies
+    FOR_EACH(p, packages) {
+      if (!p->has(PACKAGE_ACT_INSTALL)) continue;
+      p->ensureIsDownloaded();
+    }
+    // update UI
+    find_online_status_text->SetLabel(_LABEL_("found online installing"));
+    Layout();
+    Refresh();
+    Update();
+    wxSafeYield(this, true);
+    // install stylesheet and dependencies
+    FOR_EACH(p, packages) {
+      if (!p->has(PACKAGE_ACT_INSTALL)) continue;
+      bool package_ok = package_manager.install(*p);
+      if (!package_ok) throw Error(_("install package failed"));
+    }
+    // auto select stylesheet and exit
+    stylesheet = StyleSheet::byGameAndName(game, failed_name);
+    EndModal(wxID_OK);
+  } catch (const Error& e) {
+    handle_error(e);
+    auto_installing = false;
+    find_online_status_text->SetLabel(_LABEL_("found online fail"));
+    ok_button->Enable(true);
+    cancel_button->Enable(true);
+    stylesheet_list->Enable(true);
+    stylesheet_filter->Enable(true);
+  }
+}
+
 void SelectStyleSheetWindow::OnOK(wxCommandEvent&) {
   done();
 }
@@ -245,22 +341,29 @@ void SelectStyleSheetWindow::done() {
 void SelectStyleSheetWindow::onUpdateUI(wxUpdateUIEvent& ev) {
   switch (ev.GetId()) {
     case wxID_OK:
-      ev.Enable(stylesheet_list->hasSelection());
+      if (!auto_installing) ev.Enable(stylesheet_list->hasSelection());
       break;
   }
 }
 
 void SelectStyleSheetWindow::onIdle(wxIdleEvent& ev) {
-  // Stuff that must be done in the main thread
-  //handle_pending_errors(); // errors are ignored until set window is shown
+  if (searching_online && !auto_installing) {
+    // still downloading?
+    if (!downloadable_installers.download()) {
+      return;
+    }
+    // installer list ready
+    tryAutoInstall();
+  }
 }
 
 BEGIN_EVENT_TABLE(SelectStyleSheetWindow, wxDialog)
-  EVT_GALLERY_SELECT  (ID_STYLESHEET_LIST, SelectStyleSheetWindow::onStyleSheetSelect)
-  EVT_GALLERY_ACTIVATE(ID_STYLESHEET_LIST, SelectStyleSheetWindow::onStyleSheetActivate)
-  EVT_COMMAND_RANGE(ID_STYLESHEET_FILTER, ID_STYLESHEET_FILTER, wxEVT_COMMAND_TEXT_UPDATED, SelectStyleSheetWindow::onStylesheetFilterUpdate)
-  EVT_BUTTON          (wxID_OK,            SelectStyleSheetWindow::OnOK)
-  EVT_UPDATE_UI       (wxID_ANY,           SelectStyleSheetWindow::onUpdateUI)
-  EVT_IDLE            (                    SelectStyleSheetWindow::onIdle)
+  EVT_GALLERY_SELECT  (ID_STYLESHEET_LIST,     SelectStyleSheetWindow::onStyleSheetSelect)
+  EVT_GALLERY_ACTIVATE(ID_STYLESHEET_LIST,     SelectStyleSheetWindow::onStyleSheetActivate)
+  EVT_COMMAND_RANGE   (ID_STYLESHEET_FILTER, ID_STYLESHEET_FILTER, wxEVT_COMMAND_TEXT_UPDATED, SelectStyleSheetWindow::onStylesheetFilterUpdate)
+  EVT_BUTTON          (ID_DOWNLOAD_STYLESHEET, SelectStyleSheetWindow::onFindOnline)
+  EVT_BUTTON          (wxID_OK,                SelectStyleSheetWindow::OnOK)
+  EVT_UPDATE_UI       (wxID_ANY,               SelectStyleSheetWindow::onUpdateUI)
+  EVT_IDLE            (                        SelectStyleSheetWindow::onIdle)
 END_EVENT_TABLE  ()
 

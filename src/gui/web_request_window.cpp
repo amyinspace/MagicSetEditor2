@@ -27,8 +27,8 @@ WebRequestWindow::WebRequestWindow(const String& url, bool sizer)
       s->Add(address, 0, (wxALL & ~wxTOP), 4);
       s->Add(gauge, 0, wxEXPAND | wxALL, 8);
       s->Add(CreateButtonSizer(wxCANCEL), 1, wxEXPAND, 8);
-    s->SetSizeHints(this);
     SetSizer(s);
+    s->SetSizeHints(this);
   }
 
   // create web request
