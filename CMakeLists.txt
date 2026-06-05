@@ -27,10 +27,9 @@ if( NOT HUNSPELL_FOUND )
 	endif()
 endif()
 
-# You will most likely get a message about being unable to open hunspell-1.7.lib because pkgconf forgets to add the actual path to
-# HUNSPELL_LIBRARIES. If so, uncomment the below line and point it to the correct vcpkg root folder/library. (For debug builds, add "debug\\" just before "lib\\")
+# You will most likely get a message about being unable to open hunspell-1.7.lib because pkgconf forgets to add the actual path to HUNSPELL_LIBRARIES.
+# If so, uncomment the below line and point it to the correct vcpkg root folder/library. (For debug builds, add "debug\\" just before "lib\\")
 #set(HUNSPELL_LIBRARIES "C:\\PATH\\TO\\ROOT\\vcpkg\\installed\\${VCPKG_TARGET_TRIPLET}\\lib\\hunspell-1.7.lib")
-message("-- Does this have a full path? If not, and it's just a file name, it's broken: Found Hunspell at ${HUNSPELL_LIBRARIES}")
 
 include_directories("${PROJECT_BINARY_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
@@ -143,4 +142,4 @@ endif()
 include(test/tests.cmake)
 
 # Debug Message
-message("-- Does this have a full path? If not, and it's just a file name, it's broken: Found Hunspell at ${HUNSPELL_LIBRARIES}")
+message("-- Does this have a full path? If not, and it's just a file name, it's broken: ${HUNSPELL_LIBRARIES}")

@@ -280,7 +280,7 @@ void RotatedDC::DrawRoundedRectangle(const RealRect& r, double radius) {
 void RotatedDC::DrawInvertRectangle(const RealRect& r) {
   wxRect r_ext = trRectToBB(r);
 
-  wxBitmap bmp(r_ext.width, r_ext.height, 24); 
+  wxBitmap bmp(r_ext.width, r_ext.height, 24);
   wxMemoryDC memDC(bmp);
   memDC.Blit(0, 0, r_ext.width, r_ext.height, &dc, r_ext.x, r_ext.y);
   memDC.SelectObject(wxNullBitmap);

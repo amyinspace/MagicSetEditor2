@@ -59,6 +59,7 @@ void TextCtrl::updateSize() {
   viewer.bounding_box.width  = cs.GetWidth()  - 2;
   viewer.bounding_box.height = cs.GetHeight() - 2;
   viewers.front()->getEditor()->determineSize(true);
+  InvalidateBestSize();
 }
 
 void TextCtrl::setValue(String* value, bool untagged) {
