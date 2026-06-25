@@ -69,6 +69,9 @@ void Set::updateStyles(const CardP& card, bool only_content_dependent) {
 void Set::updateDelayed() {
   script_manager->updateDelayed();
 }
+void Set::updateLinkScripts(const CardP& card) {
+  script_manager->updateLinkScripts(card);
+}
 void Set::buildUIDMap() {
   card_uids.clear();
   FOR_EACH(c, cards) {

@@ -29,8 +29,8 @@ void TextValueViewer::draw(RotatedDC& dc) {
   }
   if (!v.prepared()) {
     v.prepare(dc, value().value(), style(), getContext());
-    dc.setStretch(getStretch());
   }
+  dc.setStretch(getStretch());
   DrawWhat what = drawWhat();
   v.draw(dc, style(), (DrawWhat)(what & DRAW_ACTIVE), nativeLook());
   setFieldBorderPen(dc);

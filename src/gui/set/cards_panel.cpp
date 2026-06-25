@@ -35,10 +35,15 @@ CardsPanel::CardsPanel(Window* parent, int id)
   editor          = new CardEditor(this, ID_EDITOR);
   link_editor     = new CardEditor(this, ID_CARD_LINK_EDITOR);
   focused_editor  = editor;
+  link_editor->is_focused = false;
   link_viewer_1   = new CardViewer(this, ID_CARD_LINK_VIEWER);
   link_viewer_2   = new CardViewer(this, ID_CARD_LINK_VIEWER);
   link_viewer_3   = new CardViewer(this, ID_CARD_LINK_VIEWER);
   link_viewer_4   = new CardViewer(this, ID_CARD_LINK_VIEWER);
+  link_viewer_1->is_focused = false;
+  link_viewer_2->is_focused = false;
+  link_viewer_3->is_focused = false;
+  link_viewer_4->is_focused = false;
   link_relation_1 = new wxStaticText(this, ID_CARD_LINK_RELATION_1, _(""), wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
   link_relation_2 = new wxStaticText(this, ID_CARD_LINK_RELATION_2, _(""), wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
   link_relation_3 = new wxStaticText(this, ID_CARD_LINK_RELATION_3, _(""), wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
@@ -763,5 +768,8 @@ void CardsPanel::getCardLists(vector<CardListBase*>& out) {
 }
 
 void CardsPanel::setFocusedEditor(DataEditor* editor) {
+  focused_editor->is_focused = false;
   focused_editor = editor;
+  focused_editor->is_focused = true;
+  focused_editor->Refresh();
 }

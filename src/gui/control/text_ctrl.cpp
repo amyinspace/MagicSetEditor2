@@ -94,7 +94,7 @@ void TextCtrl::onChangeSet() {
     setStyles(set->stylesheet, styles);
     setData(values);
     updateSize();
-    onChange();
+    onChange(true);
   } else {
     setValue(nullptr);
   }
@@ -115,7 +115,7 @@ void TextCtrl::onInit() {
 void TextCtrl::onSize(wxSizeEvent&) {
   if (!viewers.empty()) {
     updateSize();
-    onChange();
+    onChange(true);
   }
 }
 wxSize TextCtrl::DoGetBestSize() const {

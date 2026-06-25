@@ -24,8 +24,9 @@ DEFINE_EVENT_TYPE(EVENT_SIZE_CHANGE);
 
 CardViewer::CardViewer(Window* parent, int id, long style)
   : wxControl(parent, id, wxDefaultPosition, wxDefaultSize, style)
-  , up_to_date(false)
+  , up_to_date(false), is_focused(true), redraw_pending(false)
 {
+  redraw_timer.SetOwner(this, ID_REDRAW_TIMER);
   SetBackgroundStyle(wxBG_STYLE_PAINT);
 }
 
@@ -45,22 +46,31 @@ wxSize CardViewer::DoGetBestSize() const {
   return cs;
 }
 
-void CardViewer::redraw(const ValueViewer& v) {
+void CardViewer::redraw(const ValueViewer& v, bool force) {
   // Don't refresh if we OR ANOTHER CardViewer is drawing
   // drawing another viewer causes styles to be updated for its active card, which may be different,
   // causing the two viewers to continously refresh.
   if (drawing_card()) return;
   up_to_date = false;
+  // Don't refresh if we are out of focus. We will be refreshed in the next onIdle call.
+  if (!force && !is_focused) {
+    redraw_pending = true;
+    return;
+  }
   RefreshRect(getRotation().trRectToBB(v.boundingBoxBorder()), false);
 }
 
-void CardViewer::onChange() {
-  redraw();
+void CardViewer::onChange(bool force) {
+  redraw(force);
 }
 
-void CardViewer::redraw() {
+void CardViewer::redraw(bool force) {
   if (drawing_card()) return;
   up_to_date = false;
+  if (!force && !is_focused) {
+    redraw_pending = true;
+    return;
+  }
   Refresh(false);
 }
 
@@ -132,6 +142,18 @@ bool CardViewer::shouldDraw(const ValueViewer& v) const {
   return GetUpdateRegion().Contains(getRotation().trRectToBB(v.boundingBoxBorder().toRect()).toRect()) != wxOutRegion;
 }
 
+void CardViewer::onIdle(wxIdleEvent&) {
+  if (is_focused) return;
+  if (redraw_pending) {
+    redraw_pending = false;
+    if (!redraw_timer.IsRunning()) redraw_timer.Start(1500, wxTIMER_ONE_SHOT);
+  }
+}
+
+void CardViewer::onTimer(wxTimerEvent& ev) {
+  Refresh(false);
+}
+
 // helper class for overdrawDC()
 class CardViewer::OverdrawDC_aux : private wxClientDC {
 protected:
@@ -178,4 +200,6 @@ Rotation CardViewer::getRotation() const {
 BEGIN_EVENT_TABLE(CardViewer, wxControl)
   EVT_PAINT(CardViewer::onPaint)
   EVT_LEFT_DOWN(CardViewer::onClick)
+  EVT_IDLE(CardViewer::onIdle)
+  EVT_TIMER(ID_REDRAW_TIMER, CardViewer::onTimer)
 END_EVENT_TABLE  ()

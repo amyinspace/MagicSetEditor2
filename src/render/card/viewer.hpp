@@ -53,7 +53,7 @@ public:
   /// The card we are viewing, can be null
   inline const CardP& getCard() const { return card; }
   /// Invalidate and redraw (the area of) a single value viewer
-  virtual void redraw(const ValueViewer&) {}
+  virtual void redraw(const ValueViewer&, bool force = false) {}
   
   /// The package containing style stuff like images
   virtual Package& getStylePackage() const;
@@ -91,7 +91,7 @@ protected:
   void onAction(const Action&, bool undone) override;
   
   /// Notification that the total image has changed
-  virtual void onChange() {}
+  virtual void onChange(bool force = false) {}
   /// Notification that the viewers are initialized
   virtual void onInit() {}
   /// Notification that the size of the viewer may have changed

@@ -340,6 +340,12 @@ bool TextValueEditor::onLeftDown(const RealPoint& pos, wxMouseEvent& ev) {
   } else {
     // no, select text
     selecting = true;
+    if (!v.prepared()) {
+      auto dcP = editor().overdrawDC();
+      RotatedDC& dc = *dcP;
+      Rotater r(dc, getRotation());
+      v.prepare(dc, value().value(), style(), getContext());
+    }
     moveSelection(TYPE_INDEX, v.indexAt(pos), !ev.ShiftDown(), MOVE_MID);
   }
   return true;
@@ -353,6 +359,12 @@ bool TextValueEditor::onLeftUp(const RealPoint& pos, wxMouseEvent&) {
 bool TextValueEditor::onMotion(const RealPoint& pos, wxMouseEvent& ev) {
   if (dropDownShown()) return false;
   if (ev.LeftIsDown() && selecting) {
+    if (!v.prepared()) {
+      auto dcP = editor().overdrawDC();
+      RotatedDC& dc = *dcP;
+      Rotater r(dc, getRotation());
+      v.prepare(dc, value().value(), style(), getContext());
+    }
     size_t index = v.indexAt(pos);
     if (select_words) {
       // on the left, swap start and end
@@ -1142,6 +1154,7 @@ void TextValueEditor::tryAutoReplace() {
 }
 
 void TextValueEditor::moveSelection(IndexType t, size_t new_end, bool also_move_start, Movement dir) {
+  if (!v.prepared()) return;
   size_t old_start = selection_start_i;
   size_t old_end   = selection_end_i;
   moveSelectionNoRedraw(t, new_end, also_move_start, dir);

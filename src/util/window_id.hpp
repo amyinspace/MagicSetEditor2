@@ -338,6 +338,8 @@ enum ControlID {
   ID_CARD_LINK_RELATION_4,
   // Select stylesheet window
   ID_DOWNLOAD_STYLESHEET,
+  // Select stylesheet window
+  ID_REDRAW_TIMER,
 };
 
 // ----------------------------------------------------------------------------- : Custom Events

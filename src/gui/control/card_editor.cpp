@@ -361,16 +361,6 @@ void DataEditor::onMotion(wxMouseEvent& ev) {
   }
 }
 
-void DataEditor::onMouseEnter(wxMouseEvent& ev) {
-  ev.Skip();
-  if (GetId() == ID_CARD_LINK_EDITOR) {
-    CardsPanel* panel = dynamic_cast<CardsPanel*> (GetParent());
-    if (panel) {
-      panel->refreshCard(card);
-    }
-  }
-}
-
 void DataEditor::onMouseLeave(wxMouseEvent& ev) {
   // on mouse leave for editor
   if (hovered_viewer) {
@@ -459,7 +449,7 @@ void DataEditor::onChar(wxKeyEvent& ev) {
       wxNavigationKeyEvent evt;
       GetParent()->HandleWindowEvent(evt);
     } else {
-      // try to select the previos editor
+      // try to select the previous editor
       if (selectPrevious()) return;
       // send a navigation event to our parent, to select another control
       wxNavigationKeyEvent evt;
@@ -474,6 +464,7 @@ void DataEditor::onChar(wxKeyEvent& ev) {
     ev.Skip();
   }
 
+  // TODO: Figure out how to send an event instead of doing this
   if (GetId() == ID_CARD_LINK_EDITOR) {
     CardsPanel* panel = dynamic_cast<CardsPanel*> (GetParent());
     if (panel) {
@@ -542,7 +533,6 @@ BEGIN_EVENT_TABLE(DataEditor, CardViewer)
   EVT_RIGHT_DOWN     (DataEditor::onRightDown)
   EVT_MOTION         (DataEditor::onMotion)
   EVT_MOUSEWHEEL     (DataEditor::onMouseWheel)
-  EVT_ENTER_WINDOW   (DataEditor::onMouseEnter)
   EVT_LEAVE_WINDOW   (DataEditor::onMouseLeave)
   EVT_CONTEXT_MENU   (DataEditor::onContextMenu)
   EVT_MENU           (wxID_ANY, DataEditor::onMenu)

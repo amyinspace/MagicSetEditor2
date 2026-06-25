@@ -111,7 +111,6 @@ private:
   void onRightDown (wxMouseEvent&);
   void onMotion    (wxMouseEvent&);
   void onMouseWheel(wxMouseEvent&);
-  void onMouseEnter(wxMouseEvent&);
   void onMouseLeave(wxMouseEvent&);
   void onLoseCapture(wxMouseCaptureLostEvent&);
   

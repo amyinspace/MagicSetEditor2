@@ -143,7 +143,7 @@ void DataViewer::setCard(const CardP& card, bool refresh) {
 void DataViewer::onChangeSet() {
   viewers.clear();
   onInit();
-  onChange();
+  onChange(true);
   onChangeSize();
 }
 
@@ -193,7 +193,7 @@ void DataViewer::setData(IndexMap<FieldP,ValueP>& values, IndexMap<FieldP,ValueP
       v->setValue(val);
     }
   }
-  onChange();
+  onChange(true);
 }
 
 
@@ -218,7 +218,17 @@ void DataViewer::onAction(const Action& action, bool undone) {
         }
       }
     }
+    else if (action.card && card && set) {
+      vector<pair<CardP, String>> linked_cards = card->getLinkedCards(*set);
+      for (const auto& pair : linked_cards) {
+        if (action.card == pair.first.get()) {
+          set->updateLinkScripts(card);
+          break;
+        }
+      }
+    }
   }
+
   TYPE_CASE(action, ScriptValueEvent) {
     if (action.card == card.get()) {
       FOR_EACH(v, viewers) {
