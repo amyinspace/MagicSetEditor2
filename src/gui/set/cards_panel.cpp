@@ -602,6 +602,32 @@ void CardsPanel::doSelectAll() {
   CUT_COPY_PASTE(doSelectAll, return (void))
 }
 
+// ----------------------------------------------------------------------------- : Resetting
+
+bool CardsPanel::canDefaultReset() const {
+  int id = focused_control(this); if (id == ID_EDITOR) {
+    return editor->canDefaultReset();
+  }
+  else if (id == ID_CARD_LINK_EDITOR) {
+    return link_editor->canDefaultReset();
+  }
+  else {
+    return false;
+  }
+}
+
+void CardsPanel::doDefaultReset() {
+  int id = focused_control(this); if (id == ID_EDITOR) {
+    return (void)editor->doDefaultReset();
+  }
+  else if (id == ID_CARD_LINK_EDITOR) {
+    return (void)link_editor->doDefaultReset();
+  }
+  else {
+    return (void)false;
+  }
+}
+
 // ----------------------------------------------------------------------------- : Searching
 
 class CardsPanel::SearchFindInfo : public FindInfo {

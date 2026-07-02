@@ -51,11 +51,16 @@ public:
   void doCut() override;
   void doCopy() override;
   void doPaste() override;
-  
+
   // --------------------------------------------------- : Text selection
 
   bool canSelectAll() const override;
   void doSelectAll() override;
+
+  // --------------------------------------------------- : Resetting
+
+  bool canDefaultReset() const override;
+  void doDefaultReset() override;
 
   // --------------------------------------------------- : Searching (find/replace)
 

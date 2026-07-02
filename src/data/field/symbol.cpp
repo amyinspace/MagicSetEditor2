@@ -55,6 +55,11 @@ bool SymbolValue::isDefault() {
   return filename.empty();
 }
 
+void SymbolValue::makeDefault(bool d) {
+  if (!d) return;
+  filename.makeEmpty();
+}
+
 IMPLEMENT_REFLECTION_NO_GET_MEMBER(SymbolValue) {
   if (fieldP->save_value || !handler.isWriting) REFLECT_NAMELESS(filename);
 }

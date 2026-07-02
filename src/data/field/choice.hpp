@@ -202,6 +202,8 @@ public:
 
   bool isDefault() override;
 
+  void makeDefault(bool d = true) override;
+
   bool update(Context&) override;
 };
 

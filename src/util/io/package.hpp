@@ -48,6 +48,11 @@ public:
   inline bool empty() const {
     return fn.empty();
   }
+
+  inline void makeEmpty() {
+    fn.clear();
+  }
+
   inline bool operator == (LocalFileName const& that) const {
     return this->fn == that.fn;
   }

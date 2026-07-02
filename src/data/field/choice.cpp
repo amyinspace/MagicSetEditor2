@@ -323,6 +323,10 @@ bool ChoiceValue::isDefault() {
   return value.isDefault();
 }
 
+void ChoiceValue::makeDefault(bool d) {
+  value.makeDefault(d);
+}
+
 bool ChoiceValue::update(Context& ctx) {
   bool change = field().default_script.invokeOnDefault(ctx, value)
               | field().        script.invokeOn(ctx, value);

@@ -50,6 +50,8 @@ public:
   Age       last_update; ///< When was the image last changed?
 
   bool isDefault() override;
+
+  void makeDefault(bool d = true) override;
 };
 
 // ----------------------------------------------------------------------------- : ImageStyle

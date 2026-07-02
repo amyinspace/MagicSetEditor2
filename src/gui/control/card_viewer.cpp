@@ -122,12 +122,14 @@ void CardViewer::onPaint(wxPaintEvent&) {
 }
 
 void CardViewer::onClick(wxMouseEvent& ev) {
-  ev.Skip(); // allow DataEditor::onLeftDown to process this event as well
   if (GetId() == ID_CARD_LINK_VIEWER) {
     CardsPanel* panel = dynamic_cast<CardsPanel*> (GetParent());
     if (panel) {
       panel->setCard(getCard(), true);
     }
+  }
+  else {
+    ev.Skip(); // allow DataEditor::onLeftDown to process this event
   }
 }
 

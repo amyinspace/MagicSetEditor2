@@ -43,6 +43,11 @@ bool ImageValue::isDefault() {
   return filename.empty();
 }
 
+void ImageValue::makeDefault(bool d) {
+  if (!d) return;
+  filename.makeEmpty();
+}
+
 // custom reflection: convert to ScriptImageP for scripting
 
 void ImageValue::reflect(Reader& handler) {

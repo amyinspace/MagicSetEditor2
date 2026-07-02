@@ -249,18 +249,20 @@ bool DataEditor::search(FindInfo& find, bool from_start) {
 
 // ----------------------------------------------------------------------------- : Clipboard & Formatting
 
-bool DataEditor::canCut()            const { return current_editor && current_editor->canCut();        }
-bool DataEditor::canCopy()           const { return current_editor && current_editor->canCopy();       }
-bool DataEditor::canPaste()          const { return current_editor && current_editor->canPaste();      }
-bool DataEditor::canFormat(int type) const { return current_editor && current_editor->canFormat(type); }
-bool DataEditor::hasFormat(int type) const { return current_editor && current_editor->hasFormat(type); }
-bool DataEditor::canSelectAll()      const { return current_editor && current_editor->canSelectAll();  }
+bool DataEditor::canCut()            const { return current_editor && current_editor->canCut();          }
+bool DataEditor::canCopy()           const { return current_editor && current_editor->canCopy();         }
+bool DataEditor::canPaste()          const { return current_editor && current_editor->canPaste();        }
+bool DataEditor::canFormat(int type) const { return current_editor && current_editor->canFormat(type);   }
+bool DataEditor::hasFormat(int type) const { return current_editor && current_editor->hasFormat(type);   }
+bool DataEditor::canSelectAll()      const { return current_editor && current_editor->canSelectAll();    }
+bool DataEditor::canDefaultReset()   const { return current_editor && current_editor->canDefaultReset(); }
 
-void DataEditor::doCut()                   { if    (current_editor)   current_editor->doCut();         }
-void DataEditor::doCopy()                  { if    (current_editor)   current_editor->doCopy();        }
-void DataEditor::doPaste()                 { if    (current_editor)   current_editor->doPaste();       }
-void DataEditor::doFormat(int type)        { if    (current_editor)   current_editor->doFormat(type);  }
-void DataEditor::doSelectAll()             { if    (current_editor)   current_editor->doSelectAll();   }
+void DataEditor::doCut()                   { if    (current_editor)   current_editor->doCut();           }
+void DataEditor::doCopy()                  { if    (current_editor)   current_editor->doCopy();          }
+void DataEditor::doPaste()                 { if    (current_editor)   current_editor->doPaste();         }
+void DataEditor::doFormat(int type)        { if    (current_editor)   current_editor->doFormat(type);    }
+void DataEditor::doSelectAll()             { if    (current_editor)   current_editor->doSelectAll();     }
+void DataEditor::doDefaultReset()          { if    (current_editor)   current_editor->doDefaultReset();  }
 
 
 wxMenu* DataEditor::getMenu(int type) const {
@@ -307,6 +309,7 @@ void DataEditor::onLeftDClick(wxMouseEvent& ev) {
 }
 void DataEditor::onRightDown(wxMouseEvent& ev) {
   ev.Skip(); // for context menu
+  SetFocus();
   // change selection?
   selectViewer(ev, &ValueEditor::onRightDown);
 }
@@ -481,9 +484,12 @@ void DataEditor::onContextMenu(wxContextMenuEvent& ev) {
     add_menu_item_tr(&m, ID_EDIT_CUT, settings.darkModePrefix() + "cut", "cut");
     add_menu_item_tr(&m, ID_EDIT_COPY, "copy", "copy");
     add_menu_item_tr(&m, ID_EDIT_PASTE, "paste", "paste");
+    m.AppendSeparator();
+    add_menu_item_tr(&m, ID_EDIT_DEFAULT_RESET, settings.darkModePrefix() + "default_reset", "default_reset");
     m.Enable(ID_EDIT_CUT,   canCut());
     m.Enable(ID_EDIT_COPY,  canCopy());
     m.Enable(ID_EDIT_PASTE, canPaste());
+    m.Enable(ID_EDIT_DEFAULT_RESET, canDefaultReset());
     if (current_editor->onContextMenu(m, ev)) {
       PopupMenu(&m);
     }

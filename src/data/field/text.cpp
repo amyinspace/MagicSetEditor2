@@ -182,6 +182,10 @@ bool TextValue::isDefault() {
   return value.isDefault();
 }
 
+void TextValue::makeDefault(bool d) {
+  value.makeDefault(d);
+}
+
 bool TextValue::update(Context& ctx) {
   updateAge();
   WITH_DYNAMIC_ARG(last_update_age,     last_update.get());

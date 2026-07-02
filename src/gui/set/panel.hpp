@@ -67,6 +67,10 @@ public:
   virtual bool canSelectAll() const { return false; }
   virtual void doSelectAll() {}
 
+  // --------------------------------------------------- : Resetting
+  virtual bool canDefaultReset() const { return false; }
+  virtual void doDefaultReset() {}
+
   // --------------------------------------------------- : Searching (find/replace)
   virtual bool canFind()    const { return false; }        ///< Is finding possible?
   virtual bool canReplace() const { return false; }        ///< Is replacing possible?

@@ -71,6 +71,11 @@ public:
   bool canSelectAll() const;
   void doSelectAll();
 
+  // --------------------------------------------------- : Resetting
+
+  bool canDefaultReset() const;
+  void doDefaultReset();
+
   // --------------------------------------------------- : Search/replace
     
   /// Do a search or replace action for the given FindInfo

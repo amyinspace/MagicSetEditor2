@@ -1290,6 +1290,14 @@ size_t TextValueEditor::move(size_t pos, size_t start, size_t end, Movement dir)
   else                        return start;
 }
 
+// ----------------------------------------------------------------------------- : Resetting
+
+void TextValueEditor::doDefaultReset() {
+  if (!valueP()) return;
+  unique_ptr<ResetValueAction<TextValue, false>> action = make_unique<ResetValueAction<TextValue, false>>(valueP());
+  addAction(std::move(action));
+}
+
 // ----------------------------------------------------------------------------- : Search / replace
 
 bool is_word_end(const String& s, size_t pos) {

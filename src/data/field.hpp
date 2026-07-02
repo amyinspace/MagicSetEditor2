@@ -258,6 +258,8 @@ public:
   virtual String toString() const = 0;
   /// Check if this value is in the default state
   virtual bool isDefault();
+  /// Put this value back in the default state
+  virtual void makeDefault(bool d = true);
   /// Apply scripts to this value, return true if the value has changed
   virtual bool update(Context& ctx);
   /// This value has been updated by an action

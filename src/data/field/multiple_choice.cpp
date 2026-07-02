@@ -56,6 +56,10 @@ bool MultipleChoiceValue::isDefault() {
   return value.isDefault();
 }
 
+void MultipleChoiceValue::makeDefault(bool d) {
+  value.makeDefault(d);
+}
+
 bool MultipleChoiceValue::update(Context& ctx) {
   String old_value = value();
   ctx.setVariable(_("last_change"), to_script(last_change));
