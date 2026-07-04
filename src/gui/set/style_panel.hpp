@@ -33,6 +33,7 @@ public:
   void initUI(wxToolBar*, wxMenuBar*) override;
 
   // --------------------------------------------------- : Clipboard
+  
   bool canCut() const override;
   bool canCopy() const override;
   bool canPaste() const override;
@@ -43,6 +44,8 @@ public:
   void doSelectAll() override;
   
   // --------------------------------------------------- : Selection
+  
+  CardP selectedCard() const override;
   void selectCard(const CardP& card) override;
   
 private:

@@ -162,6 +162,11 @@ void StylePanel::onStylesheetFilterUpdate(wxCommandEvent&) {
 
 // ----------------------------------------------------------------------------- : Selection
 
+CardP StylePanel::selectedCard() const {
+  if (!isInitialized()) return CardP();
+  return card;
+}
+
 void StylePanel::selectCard(const CardP& card) {
   this->card = card;
   if (!isInitialized()) return;
