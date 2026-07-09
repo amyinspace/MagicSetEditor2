@@ -132,7 +132,7 @@ String tr(const String&, const String& subcat, const String& key, DefaultLocaleF
 inline String format_string(const String& format, ...) {
   va_list args;
   va_start(args, format);
-  String res = String::Format(format, args);
+  String res = String::FormatV(format, args);
   va_end(args);
   return res;
 }
