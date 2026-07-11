@@ -702,7 +702,7 @@ CardP CardsPanel::selectedCard() const {
 void CardsPanel::selectCard(const CardP& card) {
   if (!set) return; // we want onChangeSet first
 
-  card_list->SetFocus();
+  //card_list->SetFocus(); // I don't rememeber what bug this was solving, but it is preventing the search dialog from highlighting what it finds, so until I remember, this gets turned off
   card_list->setCard(card);
 
   editor->setCard(card);
