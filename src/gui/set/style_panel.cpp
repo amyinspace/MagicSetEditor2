@@ -209,8 +209,10 @@ void StylePanel::onStyleSelect(wxCommandEvent&) {
       // select no special style when selecting the same style as the set default
       stylesheet = StyleSheetP();
     }
-    set->actions.addAction(make_unique<ChangeCardStyleAction>(card, stylesheet));
-    Layout();
+    if (stylesheet != card->stylesheet) {
+      set->actions.addAction(make_unique<ChangeCardStyleAction>(card, stylesheet));
+      Layout();
+    }
   }
 }
 
