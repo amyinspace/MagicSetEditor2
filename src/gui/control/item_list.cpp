@@ -118,6 +118,7 @@ long ItemList::findGivenItemPos(const VoidP& item) {
       return pos;
     }
   }
+  return -1;
 }
 void ItemList::focusSelectedItem(bool force_focus) {
   if (GetItemCount() > 0) {

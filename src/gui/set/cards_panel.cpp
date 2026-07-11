@@ -674,13 +674,15 @@ bool CardsPanel::doReplaceAll(wxFindReplaceData& what) {
 }
 
 bool CardsPanel::search(FindInfo& find, bool from_start) {
-  bool include = from_start;
   CardP current = card_list->getCard();
-  for (size_t i = 0 ; i < set->cards.size() ; ++i) {
-    CardP card = card_list->getCard( (long) (find.forward() ? i : set->cards.size() - i - 1) );
+  bool include = from_start || card_list->findGivenItemPos(current) == -1;
+  long count = card_list->GetItemCount();
+  for (long i = 0 ; i < count ; ++i) {
+    CardP card = card_list->getCard( find.forward() ? i : count - i - 1 );
     if (card == current) include = true;
     if (include) {
       editor->setCard(card);
+      editor->updateStyles(false);
       if (editor->search(find, from_start || card != current)) {
         // found a card, call handle
         return true;
@@ -786,7 +788,10 @@ void CardsPanel::setCard(const CardP& card, bool event) {
 
 void CardsPanel::refreshCard(const CardP& card) {
   if (!set) return; // we want onChangeSet first
-  card_list->RefreshItem(card_list->findGivenItemPos(card));
+  long pos = card_list->findGivenItemPos(card);
+  if (pos != -1L) {
+    card_list->RefreshItem(pos);
+  }
 }
 
 void CardsPanel::getCardLists(vector<CardListBase*>& out) {

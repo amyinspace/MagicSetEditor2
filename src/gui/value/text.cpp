@@ -1342,16 +1342,17 @@ bool TextValueEditor::search(FindInfo& find, bool from_start) {
   size_t selection_min = index_to_untagged(value().value(), min(selection_start_i, selection_end_i));
   size_t selection_max = index_to_untagged(value().value(), max(selection_start_i, selection_end_i));
   if (find.forward()) {
-    size_t start = min(v.size(), find.searchSelection() ? selection_min : selection_max);
+    size_t start = from_start ? 0 : min(v.size(), find.searchSelection() ? selection_min : selection_max);
     for (size_t i = start ; i + find.findString().size() <= v.size() ; ++i) {
       if (matchSubstr(v, i, find)) return true;
     }
   } else {
-    size_t start = 0;
-    int end      = (int)(find.searchSelection() ? selection_max : selection_min) - (int)find.findString().size();
+    int end = from_start ?
+      (int)v.size() - (int)find.findString().size() :
+      (int)(find.searchSelection() ? selection_max : selection_min) - (int)find.findString().size();
     if (end < 0) return false;
-    for (size_t i = end ; (int)i >= (int)start ; --i) {
-      if (matchSubstr(v, i, find)) return true;
+    for (int i = end ; i >= 0 ; --i) {
+      if (matchSubstr(v, (size_t)i, find)) return true;
     }
   }
   return false;
