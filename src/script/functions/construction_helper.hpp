@@ -97,7 +97,16 @@ inline static bool set_stylesheet_container(const Game& game, CardP& card, Scrip
     if (!trim(value->toString()).empty()) {
       card->stylesheet = StyleSheet::byGameAndName(game, value->toString());
       if (card->stylesheet) {
+        IndexMap<FieldP, ValueP> old_styling_data = card->styling_data;
         card->styling_data.init(card->stylesheet->styling_fields);
+        // carry over old styling fields that have the same name and same type
+        for (IndexMap<FieldP, ValueP>::iterator new_it = card->styling_data.begin(); new_it != card->styling_data.end(); ++new_it) {
+          if (!*new_it) continue;
+          IndexMap<FieldP, ValueP>::const_iterator old_it = old_styling_data.find((*new_it)->fieldP->name);
+          if (old_it != old_styling_data.end() && *old_it && typeid(**old_it) == typeid(**new_it)) {
+            *new_it = (*old_it)->clone();
+          }
+        }
         card->extraDataFor(*card->stylesheet).init(card->stylesheet->extra_card_fields);
       }
     }
