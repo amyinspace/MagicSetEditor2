@@ -735,18 +735,26 @@ SCRIPT_FUNCTION(make_map) {
   ScriptValueP values_it = values->makeIterator();
   ScriptValueP value;
   ScriptCustomCollectionP map = make_intrusive<ScriptCustomCollection>();
+  String keys_string;
   while (key = keys_it->next()) {
-    if (key == script_nil) continue;
+    keys_string = keys_string + _(", ") + key->toString();
+    if (key == script_nil) {
+      values_it->next();
+      continue;
+    }
     if (value = values_it->next()) {
       map->key_value[key->toString()] = value;
     }
     else {
-      queue_message(MESSAGE_WARNING, "More keys than values given in function make_map!");
+      while (key = keys_it->next()) {
+        keys_string = keys_string + _(", ") + key->toString();
+      }
+      queue_message(MESSAGE_WARNING, _ERROR_1_("more keys than values", keys_string.SubString(2, keys_string.size())));
       break;
     }
   }
   if (value = values_it->next()) {
-    queue_message(MESSAGE_WARNING, "More values than keys given in function make_map!");
+    queue_message(MESSAGE_WARNING, _ERROR_1_("more values than keys", keys_string.SubString(2, keys_string.size())));
   }
   return map;
 }
