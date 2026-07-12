@@ -492,7 +492,7 @@ bool TextValueEditor::onChar(wxKeyEvent& ev) {
         String suffix;
         if (is_in_tag(value().value(), _("<li"), selection_start_i, selection_end_i)) {
           prefix = _("</li>");
-          suffix = wxString::FromUTF8("<li><bullet>• </bullet>");
+          suffix = _("<li><bullet>\u2022 </bullet>"); // \u2022 is the bullet point character
         }
         if (ev.ShiftDown()) {
           // soft line break
