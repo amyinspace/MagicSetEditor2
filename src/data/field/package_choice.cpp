@@ -51,6 +51,12 @@ IMPLEMENT_REFLECTION(PackageChoiceStyle) {
 
 // ----------------------------------------------------------------------------- : PackageChoiceValue
 
+void PackageChoiceValue::copyDataFrom(const Value& other) {
+  if (const PackageChoiceValue* o = dynamic_cast<const PackageChoiceValue*>(&other)) {
+    package_name = o->package_name;
+  }
+}
+
 String PackageChoiceValue::toString() const {
   PackagedP pack = getPackage();
   if (pack.get()) return pack->short_name;

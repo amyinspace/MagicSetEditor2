@@ -52,6 +52,13 @@ IMPLEMENT_REFLECTION_NAMELESS(MultipleChoiceValue) {
   REFLECT_BASE(ChoiceValue);
 }
 
+void MultipleChoiceValue::copyDataFrom(const Value& other) {
+  ChoiceValue::copyDataFrom(other);
+  if (const MultipleChoiceValue* o = dynamic_cast<const MultipleChoiceValue*>(&other)) {
+    last_change = o->last_change;
+  }
+}
+
 bool MultipleChoiceValue::isDefault() {
   return value.isDefault();
 }

@@ -66,7 +66,12 @@ Card::Card(Set* set, const CardP& card)
     stylesheet = set->stylesheetForP(card);
   }
   if (has_styling) {
-    styling_data.cloneFrom(card->styling_data);
+    if (stylesheet) {
+      styling_data.init(stylesheet->styling_fields);
+      styling_data.copyDataFrom(card->styling_data);
+    } else {
+      has_styling = false; // no stylesheet resolved, nothing to safely carry over
+    }
   }
   else {
     if (stylesheet && set) styling_data.cloneFrom(set->stylingDataFor(*stylesheet));

@@ -102,7 +102,13 @@ ColorValue::ColorValue(const ColorFieldP& field)
          :                               Color()
          , true)
 {}
-  
+
+void ColorValue::copyDataFrom(const Value& other) {
+  if (const ColorValue* o = dynamic_cast<const ColorValue*>(&other)) {
+    value = o->value;
+  }
+}
+
 String ColorValue::toString() const {
   if (value.isDefault()) return field().default_name;
   // is this a named color?

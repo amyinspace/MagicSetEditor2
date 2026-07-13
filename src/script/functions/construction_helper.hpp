@@ -97,7 +97,10 @@ inline static bool set_stylesheet_container(const Game& game, CardP& card, Scrip
     if (!trim(value->toString()).empty()) {
       card->stylesheet = StyleSheet::byGameAndName(game, value->toString());
       if (card->stylesheet) {
+        // Keep old styling data so matching fields (by name) can be carried over.
+        IndexMap<FieldP, ValueP> old_styling_data = card->styling_data;
         card->styling_data.init(card->stylesheet->styling_fields);
+        card->styling_data.copyDataFrom(old_styling_data);
         card->extraDataFor(*card->stylesheet).init(card->stylesheet->extra_card_fields);
       }
     }

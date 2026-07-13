@@ -51,7 +51,10 @@ class MultipleChoiceValue : public ChoiceValue {
 public:
   inline MultipleChoiceValue(const MultipleChoiceFieldP& field) : ChoiceValue(field, false) {}
   DECLARE_HAS_FIELD(MultipleChoice);
+
   ValueP clone() const override;
+
+  void copyDataFrom(const Value& other) override;
   
   String last_change; ///< Which of the choices was selected/deselected last?
   

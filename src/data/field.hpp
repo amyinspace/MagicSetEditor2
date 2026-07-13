@@ -253,6 +253,8 @@ public:
 
   /// Get a copy of this value
   virtual ValueP clone() const = 0;
+  /// Copy this value's data (not its field!) from another value if it has a compatible type, otherwise do nothing
+  virtual void copyDataFrom(const Value& other) {}
 
   /// Convert this value to a string for use in tables
   virtual String toString() const = 0;

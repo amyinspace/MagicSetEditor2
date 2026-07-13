@@ -56,7 +56,9 @@ class PackageChoiceValue : public Value {
 public:
   PackageChoiceValue(const PackageChoiceFieldP& field) : Value(field), package_name(field->initial) {}
   DECLARE_VALUE_TYPE(PackageChoice, String);
-  
+
+  void copyDataFrom(const Value& other) override;
+
   ValueType package_name;  ///< The selected package
   
   /// Get the package (if it is set), otherwise return nullptr

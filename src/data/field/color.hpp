@@ -75,7 +75,9 @@ class ColorValue : public Value {
 public:
   ColorValue(const ColorFieldP& field);
   DECLARE_VALUE_TYPE(Color, Defaultable<Color>);
-  
+
+  void copyDataFrom(const Value& other) override;
+
   ValueType value;  ///< The value
 
   bool isDefault() override;
