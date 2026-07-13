@@ -50,8 +50,8 @@ void PackageManager::evictFromCache(const String& name_) {
 
 String PackageManager::cleanFilename(const String& name_) {
   String name = trim(name_);
-  if (starts_with(name,_("/"))) name = name.substr(1);
-  if (starts_with(name,_(":NO-WARN-DEP:"))) name = name.substr(13);
+  while (starts_with(name,_("/"))) name = name.substr(1);
+  while (starts_with(name,_(":NO-WARN-DEP:"))) name = name.substr(13);
   return name;
 }
 String PackageManager::normalizeFilename(const String& name) {
