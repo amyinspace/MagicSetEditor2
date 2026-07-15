@@ -430,7 +430,7 @@ bool PackageDirectory::install(const InstallablePackage& package) {
     if (!remove_file_or_dir(n + _(".new"))) return false;
     bool ok = actual_install(package, n + _(".new"));
     if (!ok) return false;
-    move_ignored_files(n, n + _(".new")); // copy over files from the old installed version to the new one
+    move_ignored_files(n, n + _(".new"), package.description->read_only_files); // copy over files from the old installed version to the new one
     if (!remove_file_or_dir(n)) return false;
     if (!rename_file_or_dir(n + _(".new"), n)) return false;
     bless(package.description->name);

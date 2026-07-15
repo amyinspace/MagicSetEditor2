@@ -125,7 +125,7 @@ void Package::removeTempFiles(bool remove_unused) {
       // remove corresponding temp file
       remove_file(it->second.tempName);
     }
-    if (!it->second.keep && remove_unused) {
+    if (!it->second.keep && remove_unused && !isIgnoredOnSave(it->first)) {
       // also remove the record of deleted files
       FileInfos::iterator to_remove = it;
       ++it;
@@ -268,6 +268,9 @@ unique_ptr<wxOutputStream> Package::openOut(const String& file) {
 String Package::nameOut(const String& file) {
   assert(wxThread::IsMain()); // Writing should only be done from the main thread
   String name = normalize_internal_filename(file);
+  if (isIgnoredOnSave(name)) {
+    throw PackageError(_ERROR_1_("write to read only", name));
+  }
   FileInfos::iterator it = files.find(name);
   if (it == files.end()) {
     // new file
@@ -447,7 +450,7 @@ void Package::saveToDirectory(const String& saveAs, bool remove_unused, bool is_
   VCSP vcs = getVCS();
   FOR_EACH(f, files) {
     String f_out_path = saveAs + _("/") + f.first;
-    if (!f.second.keep && remove_unused) {
+    if (!f.second.keep && remove_unused && !isIgnoredOnSave(f.first)) {
       // remove files that are not to be kept
       // ignore failure (new file that is not kept)
       vcs->removeFile(f_out_path);
@@ -497,7 +500,7 @@ void Package::saveToZipfile(const String& saveAs, bool remove_unused, bool is_co
     // copy everything to a new zip file, unless it's updated or removed
     if (zipStream) newZip->CopyArchiveMetaData(*zipStream);
     FOR_EACH(f, files) {
-      if (!f.second.keep && remove_unused) {
+      if (!f.second.keep && remove_unused && !isIgnoredOnSave(f.first)) {
         // to remove a file simply don't copy it
       } else if (!is_copy && f.second.zipEntry && !f.second.wasWritten()) {
         // old file, was also in zip, not changed
@@ -587,12 +590,20 @@ IMPLEMENT_REFLECTION(Packaged) {
   REFLECT(version);
   REFLECT(compatible_version);
   REFLECT_NO_SCRIPT_N("depends_ons", dependencies); // hack for singular_form
+  REFLECT_NO_SCRIPT(read_only_files);
 }
 
 Packaged::Packaged()
   : position_hint(100000)
   , fully_loaded(true)
 {}
+
+bool Packaged::isIgnoredOnSave(const String& file) const {
+  for (const String& pattern : read_only_files) {
+    if (match_filename_wildcard(file, normalize_internal_filename(pattern))) return true;
+  }
+  return false;
+}
 
 unique_ptr<wxInputStream> Packaged::openIconFile() {
   String filename = icon_filename;

@@ -71,6 +71,7 @@ public:
   int    position_hint;                    ///< A hint for the package list
   String description;                      ///< Changelog/description
   vector<PackageDependencyP> dependencies; ///< Dependencies of this package
+  vector<String> read_only_files;          ///< Filenames/wildcard patterns of files not managed by the package
   
   /// Merge two descriptions a package. This package takes precedence
   /** Usually one of the descriptions will refer to the locally installed one, the other to the new one */

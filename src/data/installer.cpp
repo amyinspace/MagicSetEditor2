@@ -214,6 +214,7 @@ PackageDescription::PackageDescription(const Packaged& package)
   , position_hint(package.position_hint)
   //, description(package.description)
   , dependencies(package.dependencies)
+  , read_only_files(package.read_only_files)
 {
   // name
   if (full_name.empty()) full_name = short_name;
@@ -250,6 +251,7 @@ IMPLEMENT_REFLECTION_NO_SCRIPT(PackageDescription) {
   REFLECT(position_hint);
   REFLECT(description);
   REFLECT_N("depends_ons", dependencies);
+  REFLECT_NO_SCRIPT(read_only_files);
 }
 
 void PackageDescription::merge(const PackageDescription& p2) {
@@ -257,6 +259,10 @@ void PackageDescription::merge(const PackageDescription& p2) {
   if (installer_group.empty()) installer_group = p2.installer_group;
   if (short_name.empty()) short_name = p2.short_name;
   if (full_name.empty()) full_name = p2.full_name;
+  std::unordered_set<String> seen(read_only_files.begin(), read_only_files.end());
+  for (const auto& file : p2.read_only_files) {
+    if (seen.insert(file).second) read_only_files.push_back(file);
+  }
 }
 
 IMPLEMENT_REFLECTION_NO_SCRIPT(InstallerDescription) {
