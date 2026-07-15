@@ -266,6 +266,7 @@ private:
       return false;
     }
     String to_path = to + from_path.substr(from.size());
+    remove_file_or_dir(to_path);
     return rename_file_or_dir(from_path, to_path);
   }
 };
