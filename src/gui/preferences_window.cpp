@@ -69,7 +69,7 @@ public:
   void store() override;
 
 private:
-  wxCheckBox* non_normal_export, *bleed_export, *notes_export, *allow_image_download;
+  wxCheckBox* non_normal_export, *bleed_export, *notes_export, *metaimage_export, *allow_image_download;
 
   wxChoice*   export_scale, *import_scale, *clipboard_scale;
 };
@@ -287,6 +287,7 @@ TransfersPreferencesPage::TransfersPreferencesPage(Window* parent) : Preferences
   non_normal_export        = new wxCheckBox(this, wxID_ANY, _BUTTON_("rotation export"));
   bleed_export             = new wxCheckBox(this, wxID_ANY, _BUTTON_("bleed export"));
   notes_export             = new wxCheckBox(this, wxID_ANY, _BUTTON_("notes export"));
+  metaimage_export         = new wxCheckBox(this, wxID_ANY, _BUTTON_("metaimage export"));
   export_scale             = new wxChoice  (this, ID_EXPORT_ZOOM);
 
   allow_image_download     = new wxCheckBox(this, wxID_ANY, _BUTTON_("allow image download"));
@@ -297,6 +298,7 @@ TransfersPreferencesPage::TransfersPreferencesPage(Window* parent) : Preferences
   non_normal_export-> SetValue(!settings.default_stylesheet_settings.card_normal_export());
   bleed_export->      SetValue( settings.default_stylesheet_settings.card_bleed_export());
   notes_export->      SetValue( settings.default_stylesheet_settings.card_notes_export());
+  metaimage_export->  SetValue( settings.default_stylesheet_settings.card_metaimage_export());
   export_scale->Append(_LABEL_("export around 300"));
   export_scale->Append(_LABEL_("export force 300"));
   export_scale->Append(_LABEL_("export force 150"));
@@ -342,6 +344,7 @@ TransfersPreferencesPage::TransfersPreferencesPage(Window* parent) : Preferences
       s2->Add(non_normal_export, 0, wxEXPAND | wxALL, 4);
       s2->Add(bleed_export, 0, wxEXPAND | wxALL, 4);
       s2->Add(notes_export, 0, wxEXPAND | wxALL, 4);
+      s2->Add(metaimage_export, 0, wxEXPAND | wxALL, 4);
     wxSizer* s5 = new wxStaticBoxSizer(wxVERTICAL, this, _LABEL_("import"));
       s5->Add(new wxStaticText(this, wxID_ANY, _LABEL_("import desc")), 0, wxALL & ~wxLEFT, 4);
       wxSizer* s6 = new wxBoxSizer(wxHORIZONTAL);
@@ -370,6 +373,7 @@ void TransfersPreferencesPage::store() {
   settings.default_stylesheet_settings.card_normal_export     = !non_normal_export->GetValue();
   settings.default_stylesheet_settings.card_bleed_export      = bleed_export->GetValue();
   settings.default_stylesheet_settings.card_notes_export      = notes_export->GetValue();
+  settings.default_stylesheet_settings.card_metaimage_export  = metaimage_export->GetValue();
   settings.default_stylesheet_settings.export_scale_selection = export_scale->GetSelection();
 
   settings.allow_image_download                               = allow_image_download->GetValue();

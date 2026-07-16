@@ -144,6 +144,7 @@ StyleSheetSettings::StyleSheetSettings()
   , card_normal_export      (true,  true)
   , card_bleed_export       (false, true)
   , card_notes_export       (false, true)
+  , card_metaimage_export   (true,  true)
   , card_spellcheck_enabled (true,  true)
 {}
 
@@ -157,6 +158,7 @@ void StyleSheetSettings::useDefault(const StyleSheetSettings& ss) {
   if (card_normal_export     .isDefault()) card_normal_export     .assignDefault(ss.card_normal_export);
   if (card_bleed_export      .isDefault()) card_bleed_export      .assignDefault(ss.card_bleed_export);
   if (card_notes_export      .isDefault()) card_notes_export      .assignDefault(ss.card_notes_export);
+  if (card_metaimage_export  .isDefault()) card_metaimage_export  .assignDefault(ss.card_metaimage_export);
   if (card_spellcheck_enabled.isDefault()) card_spellcheck_enabled.assignDefault(ss.card_spellcheck_enabled);
 }
 
@@ -170,6 +172,7 @@ IMPLEMENT_REFLECTION_NO_SCRIPT(StyleSheetSettings) {
   REFLECT(card_normal_export);
   REFLECT(card_bleed_export);
   REFLECT(card_notes_export);
+  REFLECT(card_metaimage_export);
   REFLECT(card_spellcheck_enabled);
 }
 

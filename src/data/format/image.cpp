@@ -272,7 +272,7 @@ String export_metadata(const SetP& set, const CardP& card, double zoom, Radians 
       if (style) {
         style->update(set->getContext(card));
         // store the entire image in the metadata
-        if (style->store_in_metadata()) {
+        if (style->store_in_metadata() && settings.stylesheetSettingsFor(*stylesheet).card_metaimage_export()) {
           Image img = value->getImage(set);
           cardv_data[field->name.ToStdString()] = encodeImageInString(img);
         }
