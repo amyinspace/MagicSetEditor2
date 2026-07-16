@@ -165,9 +165,10 @@ private:
                                                                 || p->description->name.EndsWith("mse-symbol-font")))
               || (settings.check_updates_what == CHECK_APP   && (  p->description->name.EndsWith("mse-updater")
                                                                 || p->description->name.EndsWith("mse-locale")))
-            )
-            downloadable_installers.check_status = FOUND;
-            return;
+            ) {
+              downloadable_installers.check_status = FOUND;
+              return;
+            }
           }
         }
         downloadable_installers.check_status = NOT_FOUND;
