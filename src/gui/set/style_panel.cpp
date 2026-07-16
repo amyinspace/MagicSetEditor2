@@ -200,20 +200,19 @@ void StylePanel::doSelectAll()        { CUT_COPY_PASTE(doSelectAll,  return (voi
 // ----------------------------------------------------------------------------- : Events
 
 void StylePanel::onStyleSelect(wxCommandEvent&) {
-  if (list->hasSelection() && card) {
-    StyleSheetP stylesheet = list->getSelection<StyleSheet>();
-    if (stylesheet->game != set->game) {
-      throw PackageError(_("Stylesheet made for the wrong game"));
-    }
-    if (stylesheet == set->stylesheet) {
-      // select no special style when selecting the same style as the set default
-      stylesheet = StyleSheetP();
-    }
-    if (stylesheet != card->stylesheet) {
-      set->actions.addAction(make_unique<ChangeCardStyleAction>(card, stylesheet));
-      Layout();
-    }
+  if (!list->hasSelection() || !card) return;
+  StyleSheetP stylesheet = list->getSelection<StyleSheet>();
+  if (stylesheet->game != set->game) {
+    throw PackageError(_("Stylesheet made for the wrong game"));
   }
+  if (stylesheet == card->stylesheet) return;
+  if (stylesheet == set->stylesheet) {
+    // select no special style when selecting the same style as the set default
+    stylesheet = StyleSheetP();
+  }
+  if (stylesheet == card->stylesheet) return;
+  set->actions.addAction(make_unique<ChangeCardStyleAction>(card, stylesheet));
+  Layout();
 }
 
 void StylePanel::onUseForAll(wxCommandEvent&) {
