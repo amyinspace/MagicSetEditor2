@@ -652,6 +652,8 @@ void Packaged::open(const String& package, bool just_header) {
 
 void Packaged::loadFully() {
   if (fully_loaded) return;
+  dependencies.clear();
+  read_only_files.clear();
   auto stream = openIn(typeName());
   Reader reader(*stream, this, absoluteFilename() + _("/") + typeName());
   try {

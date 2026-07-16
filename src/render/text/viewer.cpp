@@ -782,7 +782,7 @@ bool TextViewer::prepareLinesAtScale(RotatedDC& dc, const vector<CharInfo>& char
     // per paragraph alignment
     size_t start = 0;
     for (size_t last = 0 ; last < lines.size() ; ++last) {
-      if (lines[last].break_after != LineBreak::SOFT || last == lines.size()) {
+      if (lines[last].break_after >= LineBreak::HARD || last+1 == lines.size()) {
         max_height = max(max_height, lines[last].bottom() - lines[start].top);
         start = last + 1;
       }
@@ -817,7 +817,7 @@ void TextViewer::alignLines(RotatedDC& dc, const vector<CharInfo>& chars, const 
     size_t start = 0;
     int n = 0;
     for (size_t last = 0 ; last < lines.size() ; ++last) {
-      if (lines[last].break_after != LineBreak::SOFT || last+1 == lines.size()) {
+      if (lines[last].break_after >= LineBreak::HARD || last+1 == lines.size()) {
         alignParagraph(start, last + 1, chars, style, RealRect(0, style.padding_top+n*style.paragraph_height, s.width, style.paragraph_height));
         start = last + 1;
         ++n;

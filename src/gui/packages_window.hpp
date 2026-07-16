@@ -41,6 +41,7 @@ private:
   
   void onOk(wxCommandEvent&);
   void onActionChange(wxCommandEvent&);
+  bool checkReadOnlyFilesBeforeRemoving();
   void onPackageSelect(wxCommandEvent&);
   void onUpdateUI(wxUpdateUIEvent&);
   void onIdle(wxIdleEvent&);

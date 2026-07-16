@@ -238,7 +238,47 @@ void PackagesWindow::onActionChange(wxCommandEvent& ev) {
   UpdateWindowUI(wxUPDATE_UI_RECURSE);
 }
 
+bool PackagesWindow::checkReadOnlyFilesBeforeRemoving() {
+  FOR_EACH(ip, installable_packages) {
+    if (!ip->has(PACKAGE_ACT_REMOVE)) continue;
+    vector<String> read_only_files;
+    try {
+      PackagedP p = package_manager.openAny(ip->description->name, true);
+      read_only_files = p->read_only_files;
+    } catch (const Error&) {
+      continue; // package can't be opened, nothing to warn about
+    }
+    if (read_only_files.empty()) continue;
+    String patterns;
+    FOR_EACH(pattern, read_only_files) {
+      if (!patterns.empty()) patterns += _("\n");
+      patterns += _("    ") + pattern;
+    }
+    wxMessageDialog dlg(
+      this,
+      _ERROR_2_("uninstall read only", ip->description->name, patterns),
+      _TITLE_("packages window"),
+      wxICON_EXCLAMATION | wxYES_NO
+    );
+    dlg.SetYesNoLabels(_BUTTON_("uninstall anyway"), _BUTTON_("abort"));
+    if (dlg.ShowModal() != wxID_YES) {
+      // Abort: un-schedule all pending removals
+      FOR_EACH(ip2, installable_packages) {
+        if (ip2->has(PACKAGE_ACT_REMOVE)) {
+          set_package_action(installable_packages, ip2, PACKAGE_ACT_NOTHING);
+        }
+      }
+      sendEvent();
+      return false;
+    }
+  }
+  return true;
+}
+
 void PackagesWindow::onOk(wxCommandEvent& ev) {
+  // check for read-only files in any packages about to be uninstalled. If the user
+  // chooses to abort, un-schedules all pending removals.
+  checkReadOnlyFilesBeforeRemoving();
   // count number of packages to change
   bool app_change = false;
   int to_change   = 0;
