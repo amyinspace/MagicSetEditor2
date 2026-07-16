@@ -319,6 +319,7 @@ enum ControlID {
   ID_SHARPEN_AMOUNT,
   // Internal window
   ID_IMPORT_ZOOM,
+  ID_CLIPBOARD_ZOOM,
   // Updates window
   ID_PACKAGE_LIST,
   ID_KEEP,

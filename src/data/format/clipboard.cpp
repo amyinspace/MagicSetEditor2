@@ -167,10 +167,11 @@ CardsOnClipboard::CardsOnClipboard(const SetP& set, const String id, const vecto
     Bitmap bmp;
     Image img;
     if (cards.size() == 1) {
-      img = export_image(set, cards[0], true, 1.0, 0.0, 0.0, &bmp);
+      Settings::ExportSettings card_settings = settings.clipboardSettingsFor(set->stylesheetFor(cards[0]));
+      img = export_image(set, cards[0], true, card_settings.zoom, card_settings.angle_radians, card_settings.bleed_pixels, &bmp);
     }
     else {
-      img = export_image(set, cards);
+      img = export_image(set, cards, 2, ExportImageMode::CLIPBOARD);
       bmp = Bitmap(img);
     }
     //wxFileDataObject* fileData = new wxFileDataObject(); // needed for pasting on desktop, but slow

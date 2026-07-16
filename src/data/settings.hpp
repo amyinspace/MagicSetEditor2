@@ -194,9 +194,11 @@ public:
   StyleSheetSettings& stylesheetSettingsFor    (const StyleSheet& stylesheet);
   double              exportScaleSettingsFor   (const StyleSheet& stylesheet);
   double              importScaleSettingsFor   (const StyleSheet& stylesheet);
+  double              clipboardScaleSettingsFor(const StyleSheet& stylesheet);
   double              adaptiveScaleSettingsFor (const StyleSheet& stylesheet, double target_dpi, double leeway_dpi);
   ExportSettings      exportSettingsFor        (const StyleSheet& stylesheet);
-
+  ExportSettings      clipboardSettingsFor     (const StyleSheet& stylesheet);
+  
   static const vector<int> scale_choices;
 
 private:
@@ -236,6 +238,7 @@ public:
   // --------------------------------------------------- : Internal settings
 
   int import_scale_selection;
+  int clipboard_scale_selection;
   bool allow_image_download;
 
   // --------------------------------------------------- : Update checking

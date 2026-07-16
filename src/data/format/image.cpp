@@ -146,10 +146,7 @@ Image export_image(const SetP& set, const CardP& card, bool write_metadata, doub
 Image export_image(const SetP& set,
                    const vector<CardP>& cards,
                    int padding,
-                   double global_zoom,
-                   bool use_zoom_setting,
-                   bool use_rotation_setting,
-                   bool use_bleed_setting) {
+                   ExportImageMode mode) {
   if (!set) throw Error(_("no set"));
   if (cards.size() == 0) throw Error(_("no cards"));
   vector<Image> imgs;
@@ -159,10 +156,19 @@ Image export_image(const SetP& set,
   vector<double> bleeds;
   // Draw card images
   FOR_EACH(card, cards) {
-    Settings::ExportSettings card_settings = settings.exportSettingsFor(set->stylesheetFor(card));
-    double zoom = use_zoom_setting ? global_zoom * card_settings.zoom : global_zoom;
-    double angle = use_rotation_setting ? card_settings.angle_radians : 0.0;
-    double bleed = use_bleed_setting ? card_settings.bleed_pixels : 0.0;
+    double zoom, angle, bleed;
+    if (mode == ExportImageMode::DEFAULT) {
+      zoom = 1.0;
+      angle = 0.0;
+      bleed = 0.0;
+    } else {
+      Settings::ExportSettings card_settings = mode == ExportImageMode::CLIPBOARD ?
+        settings.clipboardSettingsFor(set->stylesheetFor(card)) :
+        settings.exportSettingsFor(set->stylesheetFor(card));
+      zoom = card_settings.zoom;
+      angle = card_settings.angle_radians;
+      bleed = card_settings.bleed_pixels;
+    }
     imgs.push_back(export_image(set, card, false, zoom, angle, bleed));
     zooms.push_back(zoom);
     angles.push_back(angle);

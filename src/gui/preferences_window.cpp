@@ -71,7 +71,7 @@ public:
 private:
   wxCheckBox* non_normal_export, *bleed_export, *notes_export, *allow_image_download;
 
-  wxChoice*   export_scale, *import_scale;
+  wxChoice*   export_scale, *import_scale, *clipboard_scale;
 };
 
 // Preferences page for directories of programs
@@ -291,6 +291,7 @@ TransfersPreferencesPage::TransfersPreferencesPage(Window* parent) : Preferences
 
   allow_image_download     = new wxCheckBox(this, wxID_ANY, _BUTTON_("allow image download"));
   import_scale             = new wxChoice  (this, ID_IMPORT_ZOOM);
+  clipboard_scale          = new wxChoice  (this, ID_CLIPBOARD_ZOOM);
 
   // set values
   non_normal_export-> SetValue(!settings.default_stylesheet_settings.card_normal_export());
@@ -318,6 +319,17 @@ TransfersPreferencesPage::TransfersPreferencesPage(Window* parent) : Preferences
   if (default_import_scale < 0 || default_import_scale > import_scale->GetCount() - 1) default_import_scale = 0;
   import_scale->SetSelection(default_import_scale);
 
+  clipboard_scale->Append(_LABEL_("use export scale"));
+  clipboard_scale->Append(_LABEL_("export around 300"));
+  clipboard_scale->Append(_LABEL_("export force 300"));
+  clipboard_scale->Append(_LABEL_("export force 150"));
+  for (int i : Settings::scale_choices) {
+    clipboard_scale->Append(String::Format(_("%d%%"), i));
+  }
+  int default_clipboard_scale = settings.clipboard_scale_selection;
+  if (default_clipboard_scale < 0 || default_clipboard_scale > clipboard_scale->GetCount() - 1) default_clipboard_scale = 0;
+  clipboard_scale->SetSelection(default_clipboard_scale);
+
   // init sizers
   wxSizer* s = new wxBoxSizer(wxVERTICAL);
     wxSizer* s2 = new wxStaticBoxSizer(wxVERTICAL, this, _LABEL_("export"));
@@ -339,8 +351,16 @@ TransfersPreferencesPage::TransfersPreferencesPage(Window* parent) : Preferences
       s5->Add(s6, 0, wxEXPAND | wxALL & ~wxBottom, 4);
       s5->Add(new wxStaticText(this, wxID_ANY, _LABEL_("internal scale desc")), 0, wxALL & ~wxTOP, 4);
       s5->Add(allow_image_download, 0, wxEXPAND | wxALL, 4);
+    wxSizer* s7 = new wxStaticBoxSizer(wxVERTICAL, this, _LABEL_("clipboard"));
+      s7->Add(new wxStaticText(this, wxID_ANY, _LABEL_("clipboard desc")), 0, wxALL & ~wxLEFT, 4);
+      wxSizer* s8 = new wxBoxSizer(wxHORIZONTAL);
+        s8->Add(new wxStaticText(this, wxID_ANY, _LABEL_("scale")), 0, wxALL & ~wxLEFT, 4);
+        s8->AddSpacer(2);
+        s8->Add(clipboard_scale);
+      s7->Add(s8, 0, wxEXPAND | wxALL, 4);
     s->Add(s2, 0, wxEXPAND | wxALL, 8);
     s->Add(s5, 0, wxEXPAND | wxALL, 8);
+    s->Add(s7, 0, wxEXPAND | wxALL, 8);
   export_scale->SetFocus();
   SetSizer(s);
   s->SetSizeHints(this);
@@ -354,6 +374,7 @@ void TransfersPreferencesPage::store() {
 
   settings.allow_image_download                               = allow_image_download->GetValue();
   settings.import_scale_selection                             = import_scale->GetSelection();
+  settings.clipboard_scale_selection                          = clipboard_scale->GetSelection();
 }
 
 // ----------------------------------------------------------------------------- : Preferences page : directories

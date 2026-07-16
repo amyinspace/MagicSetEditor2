@@ -208,6 +208,7 @@ Settings::Settings()
   , print_cutter_lines       (CUTTER_ALL)
   , dark_mode_type           (DARKMODE_SYSTEM)
   , import_scale_selection   (0)
+  , clipboard_scale_selection(3)
   , allow_image_download     (true)
   , installer_list_url       (_("https://raw.githubusercontent.com/MagicSetEditorPacks/Installer-Pack/refs/heads/main/packages.txt"))
   , check_updates_what       (CHECK_EVERYTHING)
@@ -281,6 +282,14 @@ double Settings::importScaleSettingsFor(const StyleSheet& stylesheet) {
   return (double)scale_choices[import_scale_selection - 4] / 100.0;
 }
 
+double Settings::clipboardScaleSettingsFor(const StyleSheet& stylesheet) {
+  if (clipboard_scale_selection == 0) return exportScaleSettingsFor(stylesheet);
+  if (clipboard_scale_selection == 1) return adaptiveScaleSettingsFor(stylesheet, 300.0, 50.0);
+  if (clipboard_scale_selection == 2) return adaptiveScaleSettingsFor(stylesheet, 300.0, 1.0);
+  if (clipboard_scale_selection == 3) return adaptiveScaleSettingsFor(stylesheet, 150.0, 1.0);
+  return (double)scale_choices[clipboard_scale_selection - 4] / 100.0;
+}
+
 double Settings::adaptiveScaleSettingsFor(const StyleSheet& stylesheet, double dpi_target, double dpi_leeway) {
   if (abs(stylesheet.card_dpi - dpi_target) <= dpi_leeway) return 1.0;
   return dpi_target / max(10.0, stylesheet.card_dpi);
@@ -296,6 +305,14 @@ Settings::ExportSettings Settings::exportSettingsFor(const StyleSheet& styleshee
 
 IndexMap<FieldP,ValueP>& Settings::exportOptionsFor(const ExportTemplate& export_template) {
   return export_options.get(export_template.name(), export_template.option_fields);
+}
+
+Settings::ExportSettings Settings::clipboardSettingsFor(const StyleSheet& stylesheet) {
+  StyleSheetSettings& ss = stylesheetSettingsFor(stylesheet);
+  double zoom = settings.clipboardScaleSettingsFor(stylesheet);
+  double angle = ss.card_normal_export() ? 0.0 : deg_to_rad(ss.card_angle());
+  double bleed = ss.card_bleed_export() ? (stylesheet.card_dpi / 300.0) * 36.0 * zoom : 0.0; // 36 pixels of bleed on a 300 DPI print
+  return ExportSettings{zoom, angle, bleed};
 }
 
 /// Retrieve the directory to use for settings and other data files
@@ -346,6 +363,7 @@ IMPLEMENT_REFLECTION_NO_SCRIPT(Settings) {
   REFLECT(dark_mode_type);
   REFLECT(apprentice_location);
   REFLECT(import_scale_selection);
+  REFLECT(clipboard_scale_selection);
   REFLECT(allow_image_download);
   REFLECT(check_updates_what);
   REFLECT(check_updates_when);
