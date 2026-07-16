@@ -407,10 +407,9 @@ UpdatePreferencesPage::UpdatePreferencesPage(Window* parent)
   check_when          = new wxChoice(this, wxID_ANY);
   wxButton* check_now = new wxButton(this, ID_CHECK_UPDATES_NOW, _BUTTON_("check now"));
   // set values
-  check_when->Append(_BUTTON_("always"));            // 0
-  check_when->Append(_BUTTON_("every 5 startups"));  // 1
-  check_when->Append(_BUTTON_("every 10 startups")); // 2
-  check_when->Append(_BUTTON_("never"));             // 3
+  check_when->Append(_BUTTON_("every 7 days"));      // 0
+  check_when->Append(_BUTTON_("every 30 days"));     // 1
+  check_when->Append(_BUTTON_("never"));             // 2
   check_when->SetSelection(settings.check_updates_when);
   check_what->Append(_BUTTON_("check app"));         // 0
   check_what->Append(_BUTTON_("check games"));       // 1
@@ -429,9 +428,8 @@ UpdatePreferencesPage::UpdatePreferencesPage(Window* parent)
 
 void UpdatePreferencesPage::store() {
   int sel1 = check_when->GetSelection();
-  if      (sel1 == 0) settings.check_updates_when = CHECK_ALWAYS;
-  else if (sel1 == 1) settings.check_updates_when = CHECK_5;
-  else if (sel1 == 2) settings.check_updates_when = CHECK_10;
+  if      (sel1 == 0) settings.check_updates_when = CHECK_7_DAYS;
+  else if (sel1 == 1) settings.check_updates_when = CHECK_30_DAYS;
   else                settings.check_updates_when = CHECK_NEVER;
 
   int sel2 = check_what->GetSelection();

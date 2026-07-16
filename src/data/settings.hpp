@@ -28,9 +28,8 @@ DECLARE_POINTER_TYPE(AutoReplace);
 
 /// When to check for updates?
 enum CheckUpdates
-{  CHECK_ALWAYS
-,  CHECK_5
-,  CHECK_10
+{  CHECK_7_DAYS
+,  CHECK_30_DAYS
 ,  CHECK_NEVER
 };
 
@@ -241,10 +240,10 @@ public:
 
   // --------------------------------------------------- : Update checking
 
-  String installer_list_url;   ///< available installers
+  String installer_list_url;    ///< available installers
   CheckUpdatesTargets check_updates_what;
   CheckUpdates check_updates_when;
-  int check_updates_counter;
+  int check_updates_last_check; ///< date of the last successful update check, as an integer in YYYYMMDD form (0 = never checked).
 
   // --------------------------------------------------- : Help links
 

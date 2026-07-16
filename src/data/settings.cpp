@@ -26,10 +26,9 @@
 // ----------------------------------------------------------------------------- : Extra types
 
 IMPLEMENT_REFLECTION_ENUM(CheckUpdates) {
-  VALUE_N("always",   CHECK_ALWAYS);
-  VALUE_N("every 5",  CHECK_5); //default
-  VALUE_N("every 10", CHECK_10);
-  VALUE_N("never",    CHECK_NEVER);
+  VALUE_N("every 7 days",  CHECK_7_DAYS); //default
+  VALUE_N("every 30 days", CHECK_30_DAYS);
+  VALUE_N("never",         CHECK_NEVER);
 }
 
 IMPLEMENT_REFLECTION_ENUM(CheckUpdatesTargets) {
@@ -212,8 +211,8 @@ Settings::Settings()
   , allow_image_download     (true)
   , installer_list_url       (_("https://raw.githubusercontent.com/MagicSetEditorPacks/Installer-Pack/refs/heads/main/packages.txt"))
   , check_updates_what       (CHECK_EVERYTHING)
-  , check_updates_when       (CHECK_5)
-  , check_updates_counter    (0)
+  , check_updates_when       (CHECK_7_DAYS)
+  , check_updates_last_check (0)
   , website_url              (_("https://magicseteditor.boards.net/"))
   , documentation_url        (_("https://mseverse.miraheze.org/wiki/Dev:Documentation#Topics"))
   , install_type             (INSTALL_DEFAULT)
@@ -350,7 +349,7 @@ IMPLEMENT_REFLECTION_NO_SCRIPT(Settings) {
   REFLECT(allow_image_download);
   REFLECT(check_updates_what);
   REFLECT(check_updates_when);
-  REFLECT(check_updates_counter);
+  REFLECT(check_updates_last_check);
   REFLECT(install_type);
   REFLECT(website_url);
   REFLECT(documentation_url);

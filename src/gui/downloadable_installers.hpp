@@ -13,6 +13,7 @@
 #include <wx/wfstream.h>
 #include <wx/webrequest.h>
 #include <wx/dialup.h>
+#include <wx/datetime.h>
 
 class DownloadableInstallerList;
 
@@ -28,17 +29,13 @@ public:
 
   /// Check for updates if the settings say so
   inline void check_updates() {
-    settings.check_updates_counter++;
     wxDialUpManager* manager = wxDialUpManager::Create();
     bool connected = manager->IsOk() && manager->IsOnline();
     delete manager;
     if (!connected) return;
-    if (
-         (settings.check_updates_when == CHECK_ALWAYS)
-      || (settings.check_updates_when == CHECK_5  && settings.check_updates_counter > 4)
-      || (settings.check_updates_when == CHECK_10 && settings.check_updates_counter > 9)
-      ) {
-      settings.check_updates_counter = 0;
+    if (settings.check_updates_when == CHECK_NEVER) return;
+    int interval_days = (settings.check_updates_when == CHECK_7_DAYS) ? 7 : 30;
+    if (days_since_last_check() >= interval_days) {
       check_updates_now();
     }
   }
@@ -87,6 +84,24 @@ public:
 private:
   wxMutex lock;
 
+  /// Today's date, encoded as an integer YYYYMMDD
+  static inline int today_as_int() {
+    wxDateTime now = wxDateTime::Now();
+    return now.GetYear() * 10000 + (static_cast<int>(now.GetMonth()) + 1) * 100 + now.GetDay();
+  }
+
+  /// Number of days since settings.check_updates_last_check (a large number if never checked)
+  static inline int days_since_last_check() {
+    int last = settings.check_updates_last_check;
+    if (last <= 0) return 1 << 30; // never checked before, so check now
+    int y = last / 10000;
+    int m = (last / 100) % 100;
+    int d = last % 100;
+    wxDateTime last_check_date(static_cast<wxDateTime::wxDateTime_t>(d), static_cast<wxDateTime::Month>(m - 1), y);
+    wxTimeSpan elapsed = wxDateTime::Now() - last_check_date;
+    return (int)elapsed.GetDays();
+  }
+
   struct DownloadThread : public wxThread {
     inline ExitCode Entry() override {
       // fetch list
@@ -128,6 +143,7 @@ private:
           wxMilliSleep(30);
         }
         if (downloadable_installers.check_status == FAILED) return;
+        settings.check_updates_last_check = today_as_int();
         InstallablePackages installable_packages;
         FOR_EACH(inst, downloadable_installers.installers) {
           merge(installable_packages, inst);
