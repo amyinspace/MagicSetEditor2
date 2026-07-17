@@ -300,7 +300,8 @@ IMPLEMENT_REFLECTION(Set) {
       REFLECT_N("styling", styling_data);
     }
     // Experimental: save each card to a different file
-    reflect_cards(handler);
+    //reflect_cards(handler); // people seem to not like this, so move back to normal REFLECT
+    REFLECT(cards);
     REFLECT(keywords);
     REFLECT(pack_types);
   }
