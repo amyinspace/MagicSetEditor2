@@ -62,6 +62,12 @@ extern const int text_scaling;
 // img_in must be text_scaling times as large as img_out
 void downsample_to_alpha(Bitmap& bmp_in, Image& img_out);
 
+/// Resize an image, but keep a border of unchanged pixels along
+/// each edge (9-slice scaling): the corners are copied verbatim, the top/bottom
+/// edges are stretched only horizontally, the left/right edges are stretched only
+/// vertically, and only the remaining center is stretched in both directions.
+void resample_nine_slice(const Image& img_in, Image& img_out, int left, int right, int top, int bottom);
+
 // ----------------------------------------------------------------------------- : Image rotation
 
 /// Rotates an image counter clockwise

@@ -352,6 +352,22 @@ bool ResizeImage::operator == (const GeneratedImage& that) const {
     && height == that2->height;
 }
 
+// ----------------------------------------------------------------------------- : NineSliceImage
+
+Image NineSliceImage::generate(const Options& opt) {
+  Image img_in = image->generate(opt);
+  Image img_out(width, height, false);
+  resample_nine_slice(img_in, img_out, left, right, top, bottom);
+  return img_out;
+}
+bool NineSliceImage::operator == (const GeneratedImage& that) const {
+  const NineSliceImage* that2 = dynamic_cast<const NineSliceImage*>(&that);
+  return that2 && *image == *that2->image
+    && width  == that2->width  && height == that2->height
+    && left   == that2->left   && right  == that2->right
+    && top    == that2->top    && bottom == that2->bottom;
+}
+
 // ----------------------------------------------------------------------------- : StrokeImage
 
 Image StrokeImage::generate(const Options& opt) {

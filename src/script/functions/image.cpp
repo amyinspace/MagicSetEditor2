@@ -228,6 +228,17 @@ SCRIPT_FUNCTION(resize_image) {
   return make_intrusive<ResizeImage>(input, width, height);
 }
 
+SCRIPT_FUNCTION(nine_slice_image) {
+  SCRIPT_PARAM_C(GeneratedImageP, input);
+  SCRIPT_PARAM(int, width);
+  SCRIPT_PARAM(int, height);
+  SCRIPT_PARAM_DEFAULT(int, left, 0);
+  SCRIPT_PARAM_DEFAULT(int, right, 0);
+  SCRIPT_PARAM_DEFAULT(int, top, 0);
+  SCRIPT_PARAM_DEFAULT(int, bottom, 0);
+  return make_intrusive<NineSliceImage>(input, width, height, left, right, top, bottom);
+}
+
 SCRIPT_FUNCTION(crop) {
   SCRIPT_PARAM_C(GeneratedImageP, input);
   SCRIPT_PARAM(int, width);
@@ -366,6 +377,7 @@ void init_script_image_functions(Context& ctx) {
   ctx.setVariable(_("add_stroke_effect"),script_add_stroke_effect);
   ctx.setVariable(_("add_bleed_edge"),   script_add_bleed_edge);
   ctx.setVariable(_("resize_image"),     script_resize_image);
+  ctx.setVariable(_("nine_slice_image"), script_nine_slice_image);
   ctx.setVariable(_("crop"),             script_crop);
   ctx.setVariable(_("crop_image"),       script_crop);
   ctx.setVariable(_("flip_horizontal"),  script_flip_horizontal);

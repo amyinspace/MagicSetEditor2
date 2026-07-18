@@ -331,6 +331,21 @@ private:
     int height;
 };
 
+// ----------------------------------------------------------------------------- : NineSliceImage
+
+class NineSliceImage : public SimpleFilterImage {
+public:
+  inline NineSliceImage(const GeneratedImageP& image, int width, int height, int left, int right, int top, int bottom)
+    : SimpleFilterImage(image), width(max(max(0, left) + max(0, right) + 1, width)), height(max(max(0, top) + max(0, bottom) + 1, height))
+    , left(max(0, left)), right(max(0, right)), top(max(0, top)), bottom(max(0, bottom))
+  {}
+  Image generate(const Options& opt) override;
+  bool operator == (const GeneratedImage& that) const override;
+private:
+  int width, height;
+  int left, right, top, bottom;
+};
+
 // ----------------------------------------------------------------------------- : CropImage
 
 /// Crop an image at a certain point, to a certain size

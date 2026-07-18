@@ -93,6 +93,7 @@ These functions are built into the program, other [[type:function]]s can be defi
 | [[fun:invert_image]]		Invert the colors of an image.
 | [[fun:recolor_image]]		Change the colors of an image to match the font color.
 | [[fun:resize_image]]		Stretch or squeeze an image to a given height and width.
+| [[fun:nine_slice_image]]		Stretch or squeeze an image to a given height and width, but leaving the edges untouched.
 | [[fun:enlarge_image]]		Enlarge an image by putting a border around it.
 | [[fun:crop_image]]		Crop an image, giving only a small subset of it.
 | [[fun:insert_image]]		Insert an image inside another.
