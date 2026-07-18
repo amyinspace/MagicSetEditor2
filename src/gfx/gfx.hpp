@@ -120,6 +120,9 @@ void thicken_image_alpha(Image& img, int radius);
 // Create a stroke effect that goes around an image
 Image make_stroke_image(Image& img, Color stroke_color, int stroke_radius, int blur_radius = 0);
 
+// Create a mask that encodes which pixels are or neighbor transparent pixels
+Image make_visibility_mask(Image& img, int threshold, int radius);
+
 // ----------------------------------------------------------------------------- : Combining
 
 /// Ways in which images can be combined, similair to what Photoshop supports

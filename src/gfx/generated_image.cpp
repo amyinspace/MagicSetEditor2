@@ -163,6 +163,21 @@ bool SetMaskImage::operator == (const GeneratedImage& that) const {
     && *mask  == *that2->mask;
 }
 
+// ----------------------------------------------------------------------------- : VisibilityMaskImage
+
+Image VisibilityMaskImage::generate(const Options& opt) {
+  Image img = image->generate(opt);
+  return make_visibility_mask(img, threshold, radius);
+}
+bool VisibilityMaskImage::operator == (const GeneratedImage& that) const {
+  const VisibilityMaskImage* that2 = dynamic_cast<const VisibilityMaskImage*>(&that);
+  return that2 && *image == *that2->image
+    && threshold == that2->threshold
+    && radius    == that2->radius;
+}
+
+// ----------------------------------------------------------------------------- : SetAlphaImage
+
 Image SetAlphaImage::generate(const Options& opt) {
   Image img = image->generate(opt);
   set_alpha(img, alpha);

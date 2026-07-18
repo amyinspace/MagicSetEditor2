@@ -148,6 +148,13 @@ SCRIPT_FUNCTION(set_mask) {
   return make_intrusive<SetMaskImage>(image, mask);
 }
 
+SCRIPT_FUNCTION(visibility_mask) {
+  SCRIPT_PARAM_C(GeneratedImageP, input);
+  SCRIPT_PARAM_DEFAULT(int, threshold, 254);
+  SCRIPT_PARAM_DEFAULT(int, radius, 1);
+  return make_intrusive<VisibilityMaskImage>(input, threshold, radius);
+}
+
 SCRIPT_FUNCTION(set_alpha) {
   SCRIPT_PARAM_C(GeneratedImageP, input);
   SCRIPT_PARAM(double, alpha);
@@ -364,6 +371,7 @@ void init_script_image_functions(Context& ctx) {
   ctx.setVariable(_("combine_blend"),    script_combine_blend);
   ctx.setVariable(_("insert_image"),     script_insert_image);
   ctx.setVariable(_("set_mask"),         script_set_mask);
+  ctx.setVariable(_("visibility_mask"),  script_visibility_mask);
   ctx.setVariable(_("set_alpha"),        script_set_alpha);
   ctx.setVariable(_("set_combine"),      script_set_combine);
   ctx.setVariable(_("fill_image"),       script_fill_image);

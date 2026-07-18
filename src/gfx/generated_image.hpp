@@ -162,6 +162,20 @@ private:
   GeneratedImageP mask;
 };
 
+// ----------------------------------------------------------------------------- : VisibilityMaskImage
+
+/// Generate a black/white mask marking pixels that are (or neighbor) a pixel with alpha <= threshold
+class VisibilityMaskImage : public SimpleFilterImage {
+public:
+  inline VisibilityMaskImage(const GeneratedImageP& image, int threshold, int radius)
+    : SimpleFilterImage(image), threshold(threshold), radius(radius)
+  {}
+  Image generate(const Options& opt) override;
+  bool operator == (const GeneratedImage& that) const override;
+private:
+  int threshold, radius;
+};
+
 /// Change the alpha channel of an image
 class SetAlphaImage : public SimpleFilterImage {
 public:
