@@ -53,20 +53,28 @@ SCRIPT_FUNCTION(to_card_image) {
 SCRIPT_FUNCTION(import_image) {
   SCRIPT_PARAM(Set*, set);
   SCRIPT_PARAM_C(ScriptValueP, input);
-  if (input->type() == SCRIPT_IMAGE) {
-    return make_intrusive<ScriptedImage>(set, input->toImage());
+  try {
+    if (input->type() == SCRIPT_IMAGE) {
+      return make_intrusive<ScriptedImage>(set, input->toImage());
+    }
+    else if (input->type() == SCRIPT_STRING) {
+      return make_intrusive<ImportedImage>(set, input->toString());
+    }
+    throw ScriptErrorConversion(input->typeName(), _TYPE_("image"));
+  } catch (const ScriptError& e) {
+    return delay_error(e);
   }
-  else if (input->type() == SCRIPT_STRING) {
-    return make_intrusive<ImportedImage>(set, input->toString());
-  }
-  throw ScriptErrorConversion(input->typeName(), _TYPE_("image"));
 }
 
 SCRIPT_FUNCTION(download_image) {
   if (!settings.allow_image_download) return script_nil;
   SCRIPT_PARAM(Set*, set);
   SCRIPT_PARAM(String, input);
-  return make_intrusive<DownloadedImage>(set, input);
+  try {
+    return make_intrusive<DownloadedImage>(set, input);
+  } catch (const ScriptError& e) {
+    return delay_error(e);
+  }
 }
 
 // ----------------------------------------------------------------------------- : Image functions

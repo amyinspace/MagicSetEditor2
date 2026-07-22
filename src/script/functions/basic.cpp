@@ -288,16 +288,24 @@ SCRIPT_FUNCTION(to_json) {
   SCRIPT_PARAM_C(Set*, set);
   SCRIPT_PARAM_DEFAULT(bool, pretty_print, true);
   SCRIPT_PARAM_DEFAULT(bool, console_print, false);
-  boost::json::value jv = mse_to_json(input, set);
-  if (console_print) queue_message(MESSAGE_INFO, json_pretty_print(jv));
-  if (pretty_print) return to_script(json_pretty_print(jv));
-  else              return to_script(json_ugly_print(jv));
+  try {
+    boost::json::value jv = mse_to_json(input, set);
+    if (console_print) queue_message(MESSAGE_INFO, json_pretty_print(jv));
+    if (pretty_print) return to_script(json_pretty_print(jv));
+    else              return to_script(json_ugly_print(jv));
+  } catch (const ScriptError& e) {
+    return delay_error(e);
+  }
 }
 
 SCRIPT_FUNCTION(from_json) {
   SCRIPT_PARAM_C(ScriptValueP, input);
   SCRIPT_PARAM_C(Set*, set);
-  return json_to_mse(input, set);
+  try {
+    return json_to_mse(input, set);
+  } catch (const ScriptError& e) {
+    return delay_error(e);
+  }
 }
 
 SCRIPT_FUNCTION(type_name) {
